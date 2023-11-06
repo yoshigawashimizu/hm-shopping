@@ -131,8 +131,10 @@ export default {
         return
       }
 
-      // 发送请求, 登录
-      await codeLogin(this.mobile, this.msgCode)
+      // 发送请求, 登录, 获得返回的 token 令牌与 用户id
+      const res = await codeLogin(this.mobile, this.msgCode)
+      // 将返回的 token 令牌与 用户id存入 user 模块的状态中
+      this.$store.commit('user/setUserInfo', res.data)
 
       // 提示用户登录成功
       this.$toast.success('登录成功,即将跳转到主页面')
