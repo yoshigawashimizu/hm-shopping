@@ -132,13 +132,7 @@ export default {
       }
 
       // 发送请求, 登录
-      const res = await codeLogin(this.mobile, this.msgCode)
-
-      // 判断: 用户是否登录未成功
-      if (!res.status === 200) {
-        this.$toast.fail('登录失败,请刷新后重试')
-        return
-      }
+      await codeLogin(this.mobile, this.msgCode)
 
       // 提示用户登录成功
       this.$toast.success('登录成功,即将跳转到主页面')
