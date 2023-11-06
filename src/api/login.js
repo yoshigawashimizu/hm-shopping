@@ -29,3 +29,30 @@ export const getMsgCode = (captchaCode, captchaKey, mobile) => {
     }
   })
 }
+
+/** 登录接口, 点击登录按钮, 进行登录
+ * 请求路径: '/passport/login'
+ * 请求方法: post
+ * 请求传参:
+ * (1) Header 参数:
+ * platform: 当前请求的客户端（APP、小程序、H5等） 示例值: H5
+ * (2) body 参数:
+ * form: object
+ * {
+ *    mobile: 手机号
+ *    smsCode: 短信验证码， 测试环境验证码为：246810
+ *    isParty: boolean 是否存在第三方用户信息
+ *    partyData: object{0} 三方登录信息，默认为：{}
+可选
+ * }
+ */
+export const codeLogin = (mobile, smsCode) => {
+  return request.post('/passport/login', {
+    form: {
+      isParty: false, // 是否存在第三方用户信息
+      partyData: {}, // 三方登录信息
+      mobile, // 手机号
+      smsCode // 短信验证码
+    }
+  })
+}

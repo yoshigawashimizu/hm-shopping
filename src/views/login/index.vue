@@ -26,20 +26,20 @@
         </div>
         <!-- 短信验证码校验 -->
         <div class="form-item">
-          <input class="inp" placeholder="请输入短信验证码" type="text">
+          <input v-model="msgCode" class="inp" placeholder="请输入短信验证码" type="text" >
           <button @click="getCode">
           {{ second === totalSecond ? '点击获取验证码' : second + '秒后重新发送'}}
           </button>
         </div>
       </div>
       <!-- 登录按钮 -->
-      <div class="login-btn">登录</div>
+      <div class="login-btn" @click="login">登录</div>
     </div>
   </div>
 </template>
 
 <script>
-import { getPicCode, getMsgCode } from '@/api/login'// 按需导入请求函数
+import { getPicCode, getMsgCode, codeLogin } from '@/api/login'// 按需导入请求函数
 export default {
   name: 'LoginIndex', // 登录模块
   data () {
@@ -52,7 +52,8 @@ export default {
       timer: null, // 发送验证码的定时器 id
 
       mobile: '', // 用户输入的手机号
-      picCode: '' // 用户输入的验证码字符串
+      picCode: '', // 用户输入的图片验证码
+      msgCode: '' // 用户输入的短信验证码
     }
   },
   created () {
@@ -85,8 +86,8 @@ export default {
         this.$toast.success('验证码短信发送成功,请注意查收')
         // 开启短信倒计时, 每隔1s当前秒数减一
         this.timer = setInterval(() => {
-          console.log('正在倒计时...')
           this.second--
+
           // 判断: 计时器数字是否小于等于0
           if (this.second <= 0) {
             clearInterval(this.timer) // 清空计时器
@@ -113,8 +114,38 @@ export default {
         return false
       }
       return true
-    }
+    },
 
+    /** 点击登录按钮进行登录
+     *
+     */
+    async login () {
+      // 判断: 用户输入的手机号与验证码格式是否未通过校验
+      if (!this.validFn()) {
+        return
+      }
+
+      // 判断: 短信验证码是否不符合格式
+      if (!/^\d{6}$/.test(this.msgCode)) {
+        this.$toast.fail('请输入正确格式的短信验证码')
+        return
+      }
+
+      // 发送请求, 登录
+      const res = await codeLogin(this.mobile, this.msgCode)
+
+      // 判断: 用户是否登录未成功
+      if (!res.status === 200) {
+        this.$toast.fail('登录失败,请刷新后重试')
+        return
+      }
+
+      // 提示用户登录成功
+      this.$toast.success('登录成功,即将跳转到主页面')
+      setTimeout(() => {
+        this.$router.push('/')
+      }, 1400) // 1.4 秒后跳转到主页面
+    }
   },
   destroyed () {
     // 离开页面清除计时器
