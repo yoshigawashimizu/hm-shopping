@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { getPicCode } from '@/api/login'// 按需导入请求函数
+import { getPicCode, getMsgCode } from '@/api/login'// 按需导入请求函数
 export default {
   name: 'LoginIndex', // 登录模块
   data () {
@@ -71,19 +71,21 @@ export default {
     },
 
     // 点击获取短信验证码
-    getCode () {
+    async getCode () {
       // 判断: 用户输入的 手机号 与 图形验证码 没有通过校验
       if (!this.validFn()) {
         // 没有通过校验
         return
       }
-
       // 判断: 当前没有已经开启的定时器, 且 totalSecond 与 second 相等(时  器归位)
       if (!this.timer && (this.totalSecond === this.second)) {
+        // 发送短信验证码
+        await getMsgCode(this.picCode, this.picKey, this.mobile)
         // 轻提示: 告诉用户验证码发送成功
         this.$toast.success('验证码短信发送成功,请注意查收')
         // 开启短信倒计时, 每隔1s当前秒数减一
         this.timer = setInterval(() => {
+          console.log('正在倒计时...')
           this.second--
           // 判断: 计时器数字是否小于等于0
           if (this.second <= 0) {
