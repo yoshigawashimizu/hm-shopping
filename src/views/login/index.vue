@@ -60,6 +60,10 @@ export default {
       // key: 图像验证码唯一标识,用于请求时验证
       this.picUrl = base64 // 存储地址
       this.picKey = key // 存储唯一标识
+
+      // 轻提示Toast
+      // this.$toast('获取图形验证码成功')
+      this.$toast.success('获取图形验证码成功')
     }
   }
 }
