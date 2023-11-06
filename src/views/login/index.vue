@@ -16,7 +16,7 @@
       <div class="form">
         <!-- 手机号 -->
         <div class="form-item">
-          <input class="inp" maxlength="11" placeholder="请输入手机号码" type="text">
+          <input class="inp" maxlength="11" placeholder="请输入手机号码" type="text" v-model="mobile">
         </div>
         <!-- 图形验证码 -->
         <div class="form-item">
@@ -27,7 +27,9 @@
         <!-- 短信验证码校验 -->
         <div class="form-item">
           <input class="inp" placeholder="请输入短信验证码" type="text">
-          <button>获取验证码</button>
+          <button @click="getCode">
+          {{ second === totalSecond ? '点击获取验证码' : second + '秒后重新发送'}}
+          </button>
         </div>
       </div>
       <!-- 登录按钮 -->
@@ -42,9 +44,15 @@ export default {
   name: 'LoginIndex', // 登录模块
   data () {
     return {
-      picCode: '', // 用户输入的验证码字符串
       picKey: '', // 请求时一同传递的"图形验证码唯一标识"字符串
-      picUrl: '' // 存储请求渲染的图片地址
+      picUrl: '', // 存储请求渲染的图片地址
+
+      totalSecond: 60, // 发送验证码冷却秒数: 60秒
+      second: 60, // 发送验证码冷却的当前秒数
+      timer: null, // 发送验证码的定时器 id
+
+      mobile: '', // 用户输入的手机号
+      picCode: '' // 用户输入的验证码字符串
     }
   },
   created () {
@@ -60,11 +68,55 @@ export default {
       // key: 图像验证码唯一标识,用于请求时验证
       this.picUrl = base64 // 存储地址
       this.picKey = key // 存储唯一标识
+    },
 
-      // 轻提示Toast
-      // this.$toast('获取图形验证码成功')
-      this.$toast.success('获取图形验证码成功')
+    // 点击获取短信验证码
+    getCode () {
+      // 判断: 用户输入的 手机号 与 图形验证码 没有通过校验
+      if (!this.validFn()) {
+        // 没有通过校验
+        return
+      }
+
+      // 判断: 当前没有已经开启的定时器, 且 totalSecond 与 second 相等(时  器归位)
+      if (!this.timer && (this.totalSecond === this.second)) {
+        // 轻提示: 告诉用户验证码发送成功
+        this.$toast.success('验证码短信发送成功,请注意查收')
+        // 开启短信倒计时, 每隔1s当前秒数减一
+        this.timer = setInterval(() => {
+          this.second--
+          // 判断: 计时器数字是否小于等于0
+          if (this.second <= 0) {
+            clearInterval(this.timer) // 清空计时器
+            this.timer = null // 计时器重置
+            this.second = 60 // 当前秒数重置
+          }
+        }, 1000)
+      }
+    },
+
+    /** 校验 手机号 与 图形验证码 是否合法
+     *
+     * @returns 校验通过返回 true, 校验未通过返回 false
+     *  */
+    validFn () {
+      // 判断: 用户手机号是否不符合: 以1开头,第二为3-9,后面加上9位数字
+      if (!/^1[3-9]\d{9}$/.test(this.mobile)) { // 注意: 正则表达式后面可以直接使用.test() 方法来判断字符串
+        this.$toast.fail('请输入正确格式的手机号')
+        return false
+      }
+      // 判断: 用户输入的验证码是否不符合: 仅包含4个字毞字符（字母、数字或下划线）的字符串
+      if (!/^\w{4}$/.test(this.picCode)) {
+        this.$toast.fail('请输入正确的图形验证码')
+        return false
+      }
+      return true
     }
+
+  },
+  destroyed () {
+    // 离开页面清除计时器
+    clearInterval(this.timer)
   }
 }
 </script>
