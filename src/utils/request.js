@@ -15,7 +15,13 @@ const instance = axios.create({
 // 自定义配置 - 请求拦截器/响应拦截器
 // 添加请求拦截器
 instance.interceptors.request.use(function (config) {
-  // 在发送请求之前做些什么
+  // (1) 添加loading效果 (2) 禁止背景点击(节流处理, 防止多次无效触发)
+  Toast.loading({
+    duration: 0, // toast显示时长, 默认为2秒, 0为永不消失
+    message: '加载中...', // 加载提示
+    forbidClick: true, // 禁用背景点击
+    loadingType: 'spinner' // 配置loading图标
+  })
   return config
 }, function (error) {
   // 对请求错误做些什么
@@ -29,10 +35,16 @@ instance.interceptors.response.use(function (response) {
   const res = response.data // res 单纯为服务器返回的响应对象本体
   // 判断: 服务器响应对象的响应码是否不是 200
   if (res.status !== 200) {
-    // (1) 给页面反馈提示, 导入 toast 组件
-    Toast.fail(res.message) // 这里的提示信息使用后台返回的"错误提示信息"
+    // (1) 给页面反馈提示
+    Toast.fail({
+      message: res.message, // 这里的提示信息使用后台返回的"错误提示信息"
+      duration: 3000 // 3秒后关闭, 增加用户阅读错误信息的时间
+    })
     // (2) 抛出错误的promise
     return Promise.reject(res.message) // 抛出到控制台, 显示后台返回的"错误提示信息"
+  } else {
+    // 正确情况, 直接走业务核心逻辑
+    Toast.clear() // 清除loading的效果
   }
   return res
   // 对响应数据做点什么()
