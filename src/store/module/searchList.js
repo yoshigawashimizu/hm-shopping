@@ -4,6 +4,7 @@ export default {
   namespaced: true, // 开启名称空间
   state () {
     return {
+      querySearch: '', // 用户输入的搜索关键字
       page: 1, // 返回页码, 默认为1
       proList: [], // 返回搜索结果列表
       total: 0 // 返回数据总条数
@@ -22,7 +23,9 @@ export default {
      * }
      * */
     async setProList (state, obj) {
+      state.querySearch = obj.goodsName// 将用户输入的搜索关键字存入 state 中
       const { data: { list } } = await getProList(obj)
+      console.log(list)
       state.page = list.current_page
       state.proList = list.data
       state.total = list.total
