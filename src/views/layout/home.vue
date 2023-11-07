@@ -50,27 +50,10 @@
 
 <script>
 import GoodsItem from '@/components/GoodsItem.vue' // 导入商品展示框组件
-// import { getHomeData } from '@/api/home' // 导入 api 封装方法, 获取首页所有数据
 import { mapState, mapMutations } from 'vuex'// 开启 vuex 的 map 映射功能, 获取首页模块 home 中的数据
 export default {
   name: 'homeIndex', // 二级路由, 首页组件
-  data () {
-    return {
-      // page: {}, // 页面配置
-      // items: [], // 页面配置选项 {name: 配置项名称, params: 配置项参数, // style: 配置项样式, type: 配置项标签}
-      // bannerList: [], // 轮播图数据
-      // navBarList: [], // 导航数据
-      // proList: [] // 商品数据
-    }
-  },
   created () {
-    // 发送请求, 获取首页数据, 所有数据在一个接口里全部返回了
-    // const { data: { pageData } } = await getHomeData()
-    // this.page = pageData.page // 存储页面配置
-    // this.items = pageData.items // 存储页面配置项
-    // this.bannerList = pageData.items[1].data // 存储轮播图数据
-    // this.navBarList = pageData.items[3].data // 导航数据
-    // this.proList = pageData.items[6].data // 商品数据
     this.setHomeData() // 存储页面数据
   },
   methods: {
