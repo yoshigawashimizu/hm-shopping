@@ -22,10 +22,10 @@ export default {
      * }
      * */
     async setProList (state, obj) {
-      const res = await getProList(obj)
-      state.page = res.data.list.current_page
-      state.proList = res.data.list.data
-      state.total = res.data.list.total
+      const { data: { list } } = await getProList(obj)
+      state.page = list.current_page
+      state.proList = list.data
+      state.total = list.total
     }
   },
   actions: {
