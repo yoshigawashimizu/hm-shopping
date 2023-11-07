@@ -1,5 +1,6 @@
 import { getHistoryList, setHistoryList } from '@/utils/storage' // 导入存储模块, 持久化搜索历史
 import { Toast } from 'vant' // 导入 Toast 组件
+import router from '@/router' // 导入路由对象
 
 // 这是搜索模块的状态管理的文件
 export default {
@@ -17,7 +18,7 @@ export default {
      */
     goSearch (state, key) {
       // 非空判断: 输入的搜索内容是否为空
-      if (key.trim()) {
+      if (!key.trim()) {
         Toast.fail('请输入查询的商品名')
         return
       }
@@ -31,7 +32,7 @@ export default {
 
       setHistoryList(state.history) // 将搜索历史存入本地
 
-      this.$router.push(`/searchlist/?search=${key}`) // 跳转到搜索列表页
+      router.push(`/searchlist/?search=${key}`) // 跳转到搜索列表页
     },
 
     /** 传递输入框内容, 更新 state 中的 search 变量

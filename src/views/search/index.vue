@@ -18,7 +18,7 @@
         <van-icon name="delete-o" size="16" @click="clearHistory"/>
       </div>
       <div class="list" v-if="history.length > 0">
-        <div class="list-item" @click="goSearch(item)" v-for="item in history" :key="item">
+        <div class="list-item" v-for="item in history" :key="item" @click="goSearch(item)">
           {{ item }}
         </div>
       </div>
