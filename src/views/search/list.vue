@@ -44,7 +44,10 @@ export default {
     querySearch () {
       return this.$route.query.search // 通过(访问到此组件的)路由中的路径传参获取到搜索词, 路径传参参数名: search
     },
-
+    // 获取分类页查询关键字id
+    categoryId () {
+      return this.$route.query.categoryId // 通过(访问到此组件的)路由中的路径传参获取到分类页查询关键字id, 路径传参参数名: categoryId
+    },
     // 导入搜索结果模块中的 返回页面 page 和 返回搜索结果列表 proList 和 用户输入的搜索内容 querySearch
     ...mapState('searchList', ['page', 'proList'])
   },
@@ -70,7 +73,7 @@ export default {
     }
   },
   created () {
-    this.setProList({ goodsName: this.querySearch, page: this.page }) // 一加载页面就立刻获取搜索结果数据
+    this.setProList({ goodsName: this.querySearch, page: this.page, categoryId: this.categoryId }) // 一加载页面就立刻获取搜索结果数据
   },
   components: {
     GoodsItem
