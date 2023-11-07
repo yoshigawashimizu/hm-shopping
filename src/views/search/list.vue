@@ -6,7 +6,7 @@
       readonly
       shape="round"
       background="#ffffff"
-      value="手机"
+      :value="querySearch || '搜索商品'"
       show-action
       @click="$router.push('/search')"
     >
@@ -30,8 +30,25 @@
 
 <script>
 import GoodsItem from '@/components/GoodsItem.vue' // 导入商品展示框组件
+import { mapState, mapMutations } from 'vuex'// 导入搜索模块的状态映射和方法映射
+
 export default {
   name: 'ListIndex', // 搜索结果列表
+  computed: {
+    // 获取搜索输入框输入的内容
+    querySearch () {
+      return this.$route.query.search // 通过(访问到此组件的)路由中的路径传参获取到搜索词, 路径传参参数名: search
+    },
+
+    // 导入搜索结果模块中的 返回页面 page 和 // 返回搜索结果列表 proList
+    ...mapState('searchList', ['page', 'proList'])
+  },
+  methods: {
+    ...mapMutations('searchList', ['setProList']) // 导入搜索结果模块中的 "获取结果列表" 方法
+  },
+  created () {
+    this.setProList({ goodsName: this.querySearch, page: this.page }) // 一加载页面就立刻获取搜索结果数据
+  },
   components: {
     GoodsItem
   }
