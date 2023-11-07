@@ -39,8 +39,8 @@ export default {
 
 <style lang="less" scoped>
 .goods-item {
-  height: 148px;
   margin-bottom: 6px;
+  height: 148px;
   padding: 10px;
   background-color: #fff;
   display: flex;
