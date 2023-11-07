@@ -1,4 +1,5 @@
 import { getHistoryList, setHistoryList } from '@/utils/storage' // 导入存储模块, 持久化搜索历史
+import { Toast } from 'vant' // 导入 Toast 组件
 
 // 这是搜索模块的状态管理的文件
 export default {
@@ -13,9 +14,14 @@ export default {
     /** 点击搜索按钮, 通过关键字进行商品搜索
      *
      * @param {*} key String 搜索的关键字
+     * @param {*} $router object 路由器对象
      */
     goSearch (state, key) {
-      console.log('进行了搜索, 搜索历史要更新', key)
+      // 非空判断: 输入的搜索内容是否为空
+      if (!key.trim()) {
+        Toast.fail('请输入查询的商品名')
+        return
+      }
       const index = state.history.indexOf(key) // 查询搜索的关键字在历史数组中的索引位置
       // 判断: 找到的索引是否不为 -1(即有找到历史中的关键字)
       if (index !== -1) {
@@ -26,7 +32,7 @@ export default {
 
       setHistoryList(state.history) // 将搜索历史存入本地
 
-      this.$router.push(`/searchlist/?search=${key}`)// 跳转到搜索列表页
+      this.$router.push(`/searchlist/?search=${key}`) // 跳转到搜索列表页
     },
 
     /** 传递输入框内容, 更新 state 中的 search 变量
