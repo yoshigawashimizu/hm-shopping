@@ -2,9 +2,10 @@
   <div class="prodetail">
     <van-nav-bar fixed title="商品详情页" left-arrow @click-left="$router.go(-1)" />
 
+    <!-- 图片轮播区域 -->
     <van-swipe :autoplay="3000" @change="onChange">
-      <van-swipe-item v-for="(image, index) in images" :key="index">
-        <img :src="image" />
+      <van-swipe-item v-for="item in images" :key="item.file_id">
+        <img :src="item.external_url" />
       </van-swipe-item>
 
       <template #indicator>
@@ -16,13 +17,13 @@
     <div class="info">
       <div class="title">
         <div class="price">
-          <span class="now">￥0.01</span>
-          <span class="oldprice">￥6699.00</span>
+          <span class="now">￥{{ detail.goods_price_min }}</span>
+          <span class="oldprice">￥{{ detail.goods_price_max }}</span>
         </div>
-        <div class="sellcount">已售1001件</div>
+        <div class="sellcount">已售{{ detail.goods_sales }}件</div>
       </div>
       <div class="msg text-ellipsis-2">
-        三星手机 SAMSUNG Galaxy S23 8GB+256GB 超视觉夜拍系统 超清夜景 悠雾紫 5G手机 游戏拍照旗舰机s23
+        {{ detail.goods_name }}
       </div>
 
       <div class="service">
@@ -60,11 +61,8 @@
     </div>
 
     <!-- 商品描述 -->
-    <div class="desc">
-      <img src="https://uimgproxy.suning.cn/uimg1/sop/commodity/kHgx21fZMWwqirkMhawkAw.jpg" alt="">
-      <img src="https://uimgproxy.suning.cn/uimg1/sop/commodity/0rRMmncfF0kGjuK5cvLolg.jpg" alt="">
-      <img src="https://uimgproxy.suning.cn/uimg1/sop/commodity/2P04A4Jn0HKxbKYSHc17kw.jpg" alt="">
-      <img src="https://uimgproxy.suning.cn/uimg1/sop/commodity/MT4k-mPd0veQXWPPO5yTIw.jpg" alt="">
+    <!-- 特别注意: 使用的属性 content 是带有 html 标签的, 需要使用 v-html 渲染标签 -->
+    <div class="desc" v-html="detail.content">
     </div>
 
     <!-- 底部 -->
@@ -84,21 +82,39 @@
 </template>
 
 <script>
+import { getProDetail } from '@/api/product' // 导入'获取商品详细信息'的方法
 export default {
   name: 'ProdetailIndex', // 商品详情模块
   data () {
     return {
-      images: [
-        'https://img01.yzcdn.cn/vant/apple-1.jpg',
-        'https://img01.yzcdn.cn/vant/apple-2.jpg'
-      ],
-      current: 0
+      images: [], // 轮播图图片, 其中 图片url 在 external_url 下, 图片id 在 file_id 下
+      current: 0,
+      detail: {} // 商品详细信息
+    }
+  },
+  computed: {
+    // 获取来源路由中的商品id goodsId
+    goodsId () {
+      return this.$route.params.id // 获取到访问路径中传递的对象 id
     }
   },
   methods: {
+    // 页面轮播图
     onChange (index) {
       this.current = index
+    },
+    /** 获取商品详细页的所有数据, 包括商品信息与评价等等
+     *
+    */
+    async getDetail () {
+      const { data: { detail } } = await getProDetail(this.goodsId)
+      this.detail = detail // 更新响应的"商品详细信息"数据
+      this.images = detail.goods_images // 更新轮播图图片
     }
+  },
+  created () {
+    // 页面一创建, 立刻发送请求获取详细商品信息
+    this.getDetail()
   }
 }
 
