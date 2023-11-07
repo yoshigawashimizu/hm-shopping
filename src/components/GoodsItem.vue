@@ -1,19 +1,22 @@
 <!-- 组件: "猜你喜欢","商品搜索结果"商品展示框 -->
 <template>
   <!-- 判断: 商品的id goods_id 存在 -->
-  <div class="goods-item" @click="$router.push('/prodetail')" v-if="item.goods_id">
+  <div class="goods-item" @click="$router.push(`/prodetail/${item.goods_id}`)" v-if="item.goods_id">
     <div class="left">
-      <img :src="item.goods.image" alt="" />
+      <!-- 商品图片 -->
+      <img :src="item.goods_image" alt="" />
     </div>
     <div class="right">
       <p class="tit text-ellipsis-2">
-        三星手机 SAMSUNG Galaxy S23 8GB+256GB 超视觉夜拍系统 超清夜景 悠雾紫
-        5G手机 游戏拍照旗舰机s23
+        <!-- 商品名称 -->
+        {{ item.goods_name }}
       </p>
-      <p class="count">已售104件</p>
+      <p class="count">已售{{ item.goods_sales }}件</p>
       <p class="price">
-        <span class="new">¥3999.00</span>
-        <span class="old">¥6699.00</span>
+        <!-- 原价 -->
+        <span class="new">¥{{ item.goods_price_min }}</span>
+        <!-- 现价/折扣价 -->
+        <span class="old">¥{{ item.goods_price_max }}</span>
       </p>
     </div>
   </div>
@@ -23,9 +26,10 @@
 export default {
   name: 'GoodsItem', // 商品展示框组件
   props: {
+    // 数据父传子, 使用的属性名为 item
     item: {
       type: Object,
-      default: () => { // 如果传递的数据类型是对象, 则设置默认值时使用函数设置默认值, 不可以直接{}
+      default: () => { // 如果默认值是对象, 则设置默认值时使用函数设置默认值, 不可以直接{}
         return {}
       }
     }
