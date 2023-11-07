@@ -15,6 +15,7 @@
 
     <!-- 分类列表 -->
     <div class="list-box">
+      <!-- 左侧 - 大分类 -->
       <div class="left">
         <ul>
           <li v-for="(item, index) in list" :key="item.category_id">
@@ -22,6 +23,7 @@
           </li>
         </ul>
       </div>
+      <!-- 右侧 - 细分类 -->
       <div class="right">
         <div @click="$router.push(`/searchlist?categoryId=${item.category_id}`)" v-for="item in list[activeIndex]?.children" :key="item.category_id" class="cate-goods">
           <img :src="item.image?.external_url" alt="">
@@ -33,7 +35,7 @@
 </template>
 
 <script>
-import { getCategoryData } from '@/api/category'
+import { getCategoryData } from '@/api/category' // 导入'获取分类页数据'方法
 export default {
   name: 'categoryIndex', // 二级路由, 分页类组件
   created () {
