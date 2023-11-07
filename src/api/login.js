@@ -18,7 +18,6 @@ export const getPicCode = () => {
  * captchaCode: 用户输入的图形验证码
  * captchaKey: 图形验证码唯一标识
  * mobile: 手机号
- *
  */
 export const getMsgCode = (captchaCode, captchaKey, mobile) => {
   return request.post('/captcha/sendSmsCaptcha', {
