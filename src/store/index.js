@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import user from '@/store/module/user.js'// 导入用户模块 user
+import home from '@/store/module/home.js'// 导入首页模块 home
 
 Vue.use(Vuex)
 
@@ -18,6 +19,7 @@ export default new Vuex.Store({
   actions: {
   },
   modules: {
-    user // 用户模块
+    user, // 用户模块
+    home // 首页模块
   }
 })
