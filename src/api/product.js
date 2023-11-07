@@ -1,4 +1,4 @@
-// 这是获取商品展示列表的接口的封装文件
+// 这是获取商品展示列表, 获取商品详情的接口的封装文件
 import request from '@/utils/request.js' // 导入 axios 的二次封装类
 
 /** 获取商品展示列表的数据
@@ -29,6 +29,19 @@ export const getProList = (obj) => {
       categoryId,
       goodsName,
       page
+    }
+  })
+}
+/** 获取商品详情数据
+ * 请求路径: '/goods/detail'
+ * 请求方式: get
+ * 请求传参: goodsId String 商品id 可选
+ *  */
+
+export const getProDetail = (goodsId = null) => { // 如果传入的 goodsId 商品的id为undefined, 则默认值为null
+  return request.get('/goods/detail', {
+    params: {
+      goodsId
     }
   })
 }
