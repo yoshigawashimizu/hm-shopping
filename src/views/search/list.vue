@@ -23,7 +23,7 @@
     </div>
 
     <div class="goods-list">
-      <GoodsItem v-for="item in 10" :key="item"></GoodsItem>
+      <GoodsItem v-for="item in proList" :key="item.goods_id" :item="item"></GoodsItem>
     </div>
   </div>
 </template>
