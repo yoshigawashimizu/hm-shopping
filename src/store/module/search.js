@@ -14,11 +14,10 @@ export default {
     /** 点击搜索按钮, 通过关键字进行商品搜索
      *
      * @param {*} key String 搜索的关键字
-     * @param {*} $router object 路由器对象
      */
     goSearch (state, key) {
       // 非空判断: 输入的搜索内容是否为空
-      if (!key.trim()) {
+      if (key.trim()) {
         Toast.fail('请输入查询的商品名')
         return
       }
