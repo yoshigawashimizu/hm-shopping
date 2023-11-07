@@ -1,10 +1,12 @@
+import { getHistoryList, setHistoryList } from '@/utils/storage' // 导入存储模块, 持久化搜索历史
+
 // 这是搜索模块的状态管理的文件
 export default {
   namespaced: true, // 开启名称空间
   state () {
     return {
       search: '', // 输入框的内容
-      history: ['手机', '白酒', '电视'] // 搜索历史
+      history: getHistoryList() // 搜索历史列表, 优先从本地获取
     }
   },
   mutations: {
@@ -21,6 +23,10 @@ export default {
         state.history.splice(index, 1) // 从 index 索引位置开始, 删除1个
       }
       state.history.unshift(key) // 将搜索关键字添加到第1个位置
+
+      setHistoryList(state.history) // 将搜索历史存入本地
+
+      this.$router.push(`/searchlist/?search=${key}`)// 跳转到搜索列表页
     },
 
     /** 传递输入框内容, 更新 state 中的 search 变量
@@ -35,6 +41,7 @@ export default {
      */
     clearHistory (state) {
       state.history = []
+      setHistoryList([])
     }
   },
   actions: {

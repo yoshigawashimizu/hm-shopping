@@ -1,5 +1,7 @@
 // 存储模块, (1) 持久化 vuex 数据 (2) 封装"持久化数据的方法"
 
+// (1) 用户模块 user
+
 // 约定一个通用的存储用键名
 const INFO_KEY = 'hm_shopping'
 
@@ -45,4 +47,27 @@ export const setInfo = (newUserInfo) => {
  */
 export const removeInfo = () => {
   localStorage.removeItem(INFO_KEY)
+}
+
+// (2) 搜索历史 模块
+
+// 约定一个通用的存储用键名
+const HISTORY_KEY = 'hm_history_list'
+
+/** 获取存储在本地的数据
+ *
+ * @returns result 如果本地有值, 则返回本地数据
+ * @returns defaultHistory 如果本地没有值, 则返回默认数据
+ */
+export const getHistoryList = () => {
+  const result = localStorage.getItem(HISTORY_KEY) // 返回存储在本地的数据
+  return result ? JSON.parse(result) : []
+}
+
+/** 将数据存储在本地
+ *
+ * @param newHistoryList Object 新搜索历史
+ */
+export const setHistoryList = (newHistoryList) => {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(newHistoryList))
 }
