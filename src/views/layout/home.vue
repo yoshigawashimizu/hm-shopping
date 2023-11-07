@@ -23,9 +23,9 @@
     <!-- 导航 -->
     <van-grid column-num="5" icon-size="40">
       <van-grid-item
-        v-for="item in 10" :key="item"
-        icon="http://cba.itlike.com/public/uploads/10001/20230320/58a7c1f62df4cb1eb47fe83ff0e566e6.png"
-        text="新品首发"
+        v-for="item in navBarList" :key="item.imgUrl"
+        :icon="item.imgUrl"
+        :text="item.text"
         @click="$router.push('/category')"
       />
     </van-grid>
