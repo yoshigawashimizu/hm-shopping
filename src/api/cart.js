@@ -31,3 +31,20 @@ export const addCart = (goodsId, goodsNum = 1, goodsSkuId = null) => {
 export const getCartList = () => {
   return request.get('/cart/list')
 }
+
+/** 更新购物车商品数量
+ * 请求路径: '/cart/update'
+ * 请求方法: post
+ * 请求传参: (1) header 参数: Access-Token String 用户的 token 令牌 必需
+ *                           platform String 当前请求的客户端（APP、小程序、H5等） 默认 H5 必需
+ *          (2) body 参数: goodsId String 商品id 必需
+ *                         goodsNum Number 商品数量 默认为 1 必需
+ *                         goodsSkuId String 商品SKU 默认为 null 该项目只能传单值 必需
+ */
+export const changeCountApi = (goodsId, goodsNum = 1, goodsSkuId = null) => {
+  return request.post('/cart/update', {
+    goodsId, // 商品id
+    goodsNum, // 商品数量
+    goodsSkuId // 商品SKU
+  })
+}

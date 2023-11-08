@@ -1,5 +1,5 @@
 // 这是购物车模块的状态管理的文件
-import { getCartList } from '@/api/cart.js'// 导入获取购物车列表数据的api方法
+import { getCartList, changeCountApi } from '@/api/cart.js'// 导入获取购物车列表数据的api方法
 export default {
   namespaced: true, // 开启名称空间
   state () {
@@ -38,8 +38,17 @@ export default {
       state.cartList.forEach(item => {
         item.isChecked = flag
       })
+    },
+    /** 手动修改本地页面展示的商品总数
+     * @param { goodsId } 新商品总数
+     * @param { goodsNum } 被更新的商品id
+     */
+    changeCount (state, { goodsId, goodsNum }) {
+      const goods = state.cartList.find(item => item.goods_id === goodsId)
+      goods.goods_num = goodsNum // 传入新商品总数
     }
   },
+
   actions: {
     // 发送异步请求, 获取购物车列表数据
     async getCartAction (context) { // 注意: 不要忘记写context
@@ -49,6 +58,16 @@ export default {
         item.isChecked = true // 给每一项都添加一个 isChecked 状态, 标记当前商品是否选中
       })
       context.commit('setCartList', data.list) // 将关键数据存入到 state 中
+    },
+
+    // 发送异步请求, 更新数据库里商品的购买数量
+    async changeCountAction (context, obj) {
+      const { goodsNum, goodsId, goodsSku } = obj
+      // console.log('当前商品购买数量:', goodsNum, '当前商品id:', goodsId, '当前商品规格SkuId:', goodsSku)
+      // 先本地修改
+      context.commit('changeCount', { goodsId: goodsId, goodsNum: goodsNum })
+      // 再同步到后台
+      await changeCountApi(goodsId, goodsNum, goodsSku) // 备注: 也许这里可以进行防抖优化
     }
   },
   getters: {

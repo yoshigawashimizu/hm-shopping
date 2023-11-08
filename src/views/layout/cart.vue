@@ -5,7 +5,7 @@
     <div class="cart-title">
       <span class="all">共<i>{{ cartTotal }}</i>件商品</span>
       <span class="edit">
-        <van-icon name="edit" />
+        <van-icon name="edit" @click="isEdit=!isEdit"/>
         编辑
       </span>
     </div>
@@ -22,7 +22,17 @@
           <span class="tit text-ellipsis-2">{{ item.goods.goods_name }}</span>
           <span class="bottom">
             <div class="price">¥ <span>{{ item.goods.goods_price_min }}</span></div>
-            <CountBox :value="item.goods_num"></CountBox>
+            <!-- 计数盒子 -->
+            <!-- 特别注意: 监听 @input 时 (1) 需要组件的 input 通知的传值 (2) 又需要调用函数传参
+            解决方法: 使用箭头函数包装一层, 组件的传值用形参 value 接收, 函数的传值用函数的形参 item 来接收 -->
+            <CountBox
+            @input="(value) => changeCount(
+              value, // 商品购买数量 goodsNum
+              item.goods_id, // 商品id
+              item.goods_sku_id // 商品规格SkuId
+            )"
+            :value="item.goods_num">
+            </CountBox>
           </span>
         </div>
       </div>
@@ -42,7 +52,7 @@
           <span>¥ <i class="totalPrice">{{ selectedPrice }}</i></span>
         </div>
         <!-- 代码优化: 未选中任何商品, 按钮失活; css样式里提供了一个 disable 类, 当按钮不可用时切换 -->
-        <div v-if="true" class="goPay" :class="{ disabled: selectedCount === 0 }">结算({{ selectedCount }})</div>
+        <div v-if="!isEdit" class="goPay" :class="{ disabled: selectedCount === 0 }">结算({{ selectedCount }})</div>
         <div v-else class="delete" :class="{ disabled: selectedCount === 0 }">删除</div>
       </div>
     </div>
@@ -54,9 +64,31 @@ import CountBox from '@/components/CountBox.vue'// 导入计数盒子组件
 import { mapActions, mapState, mapGetters, mapMutations } from 'vuex' // 导入 vuex 提供的 map映射方法们
 export default {
   name: 'cartIndex',
+  data () {
+    return {
+      isEdit: false// '编辑按钮'是否为编辑状态, 默认为 false
+    }
+  },
   methods: {
-    ...mapActions('cart', ['getCartAction', 'toggleCheck']), // 导入 cart模块中的"获取购物车数据列表" 等方法
-    ...mapMutations('cart', ['toggleCheck', 'toggleAllCheck']) // 导入 cart 模块中的切换复选框选中状态 的方法
+    ...mapActions('cart', [
+      'getCartAction', // 获取购物车列表数据
+      'changeCountAction' // 更新数据库里商品的购买数量
+    ]),
+    ...mapMutations('cart', [
+      'toggleCheck', // 点击单项复选框, 切换商品选中状态
+      'toggleAllCheck' // 通过传入的 flag 的值, 切换全选状态
+    ]),
+    /** 组件: 计数盒子发起的通知事件
+     *
+     * @param {*} goodsNum 当前商品购买数量
+     * @param {*} goodsId 当前商品id
+     * @param {*} goodsSkuId 当前商品规格SkuId
+     */
+    changeCount (goodsNum, goodsId, goodsSkuId) {
+      console.log('当前商品购买数量:', goodsNum, '当前商品id:', goodsId, '当前商品规格SkuId:', goodsSkuId)
+      // 调用 cart 模块中的 action 方法, 进行数量的修改
+      this.changeCountAction({ goodsNum: goodsNum, goodsId: goodsId, goodsSku: goodsSkuId })
+    }
   },
   computed: {
     ...mapState('cart', ['cartList']), // 导入 cart模块中的购物车列表数据
@@ -67,6 +99,17 @@ export default {
       'selectedPrice', // 被选中的商品的总价
       'isAllChecked' // 商品是否被全选
     ])
+  },
+  watch: {
+    // 监视编辑模式变化
+    isEdit (newValue) {
+      // 判断: 是否进入了编辑模式
+      if (newValue === true) {
+        this.toggleAllCheck(false) // 删除模式, 将复选框状态变成全不选
+      } else {
+        this.toggleAllCheck(true) // 编辑模式, 将复选框状态变成全选
+      }
+    }
   },
   created () {
     // 判断: 页面加载时用户是否有登录

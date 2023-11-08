@@ -33,12 +33,13 @@ export default {
     // 用户通过输入框, 输入购买数量, 在 change 事件后触发
     handleChange (e) {
       const num = +e.target.value // 隐式数据转换, 转换成数字类型 Number
-      // 判断: num 是不是 NaN , 或者输入的数字小于1, 或者大于 999
-      if (isNaN(num) || num < 1 || num > 999) {
+      // 判断: num 是不是 NaN , 或者输入的数字小于1
+      if (isNaN(num) || num < 1) {
         // 不合法文本, 输入内容回退
         e.target.value = this.value // 值回退
         return
       }
+      console.log(num)
       this.$emit('input', num)
     }
   }
