@@ -4,6 +4,7 @@ import user from '@/store/module/user.js'// 导入用户模块 user
 import home from '@/store/module/home.js'// 导入首页模块 home
 import search from '@/store/module/search.js' // 导入搜索模块 search
 import searchList from '@/store/module/searchList' // 导入搜索结果列表模块 searchList
+import cart from '@/store/module/cart' // 导入搜索结果列表模块 searchList
 
 Vue.use(Vuex)
 
@@ -24,6 +25,7 @@ export default new Vuex.Store({
     user, // 用户模块
     home, // 首页模块
     search, // 搜索模块
-    searchList // 搜索结果展示列表
+    searchList, // 搜索结果展示列表
+    cart // 购物车模块
   }
 })
