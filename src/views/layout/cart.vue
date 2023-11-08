@@ -21,11 +21,7 @@
           <span class="tit text-ellipsis-2">新Pad 14英寸 12+128 远峰蓝 M6平板电脑 智能安卓娱乐十核游戏学习二合一 低蓝光护眼超清4K全面三星屏5GWIFI全网通 蓝魔快本平板</span>
           <span class="bottom">
             <div class="price">¥ <span>1247.04</span></div>
-            <div class="count-box">
-              <button class="minus">-</button>
-              <input class="inp" :value="4" type="text" readonly>
-              <button class="add">+</button>
-            </div>
+            <CountBox></CountBox>
           </span>
         </div>
       </div>
@@ -50,8 +46,12 @@
 </template>
 
 <script>
+import CountBox from '@/components/CountBox.vue'// 导入计数盒子组件
 export default {
-  name: 'cartIndex' // 二级路由, 购物车组件
+  name: 'cartIndex',
+  components: {
+    CountBox // 计数盒子组件
+  } // 二级路由, 购物车组件
 }
 </script>
 
