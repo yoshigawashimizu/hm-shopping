@@ -40,21 +40,22 @@
     <!-- 商品评价 -->
     <div class="comment">
       <div class="comment-title">
-        <div class="left">商品评价 (5条)</div>
+        <div class="left">商品评价 ({{ total }}条)</div>
         <div class="right">查看更多 <van-icon name="arrow" /> </div>
       </div>
       <div class="comment-list">
-        <div class="comment-item" v-for="item in 3" :key="item">
+        <div class="comment-item" v-for="item in commentList" :key="item.comment_id">
           <div class="top">
-            <img src="http://cba.itlike.com/public/uploads/10001/20230321/a0db9adb2e666a65bc8dd133fbed7834.png" alt="">
-            <div class="name">神雕大侠</div>
-            <van-rate :size="16" :value="5" color="#ffd21e" void-icon="star" void-color="#eee"/>
+            <!-- 特别处理: 如果用户头像不存在, 则使用默认值 -->
+            <img :src="item.user.avatar_url || defaultImg" alt="">
+            <div class="name">{{ item.user.nick_name }}</div>
+            <van-rate :size="16" :value="(item.score / 2)" color="#ffd21e" void-icon="star" void-color="#eee"/>
           </div>
           <div class="content">
-            质量很不错 挺喜欢的
+            {{ item.content }}
           </div>
           <div class="time">
-            2023-03-21 15:01:35
+            {{ item.create_time }}
           </div>
         </div>
       </div>
@@ -82,14 +83,18 @@
 </template>
 
 <script>
-import { getProDetail } from '@/api/product' // 导入'获取商品详细信息'的方法
+import { getProDetail, getProComments } from '@/api/product' // 导入'获取商品详细信息'等的方法
+import defaultImg from '@/assets/default-avatar.png'
 export default {
   name: 'ProdetailIndex', // 商品详情模块
   data () {
     return {
       images: [], // 轮播图图片, 其中 图片url 在 external_url 下, 图片id 在 file_id 下
       current: 0,
-      detail: {} // 商品详细信息
+      detail: {}, // 商品详细信息
+      total: 0, // 商品评价总数
+      commentList: [], // 评价列表
+      defaultImg // 无头像用户的默认头像地址
     }
   },
   computed: {
@@ -103,18 +108,28 @@ export default {
     onChange (index) {
       this.current = index
     },
-    /** 获取商品详细页的所有数据, 包括商品信息与评价等等
+    /** 获取商品详细页的所有数据, 包括商品信息等等
      *
     */
     async getDetail () {
       const { data: { detail } } = await getProDetail(this.goodsId)
       this.detail = detail // 更新响应的"商品详细信息"数据
       this.images = detail.goods_images // 更新轮播图图片
+    },
+    /** 获取商品详细页的评价
+     *
+    */
+    async getComments () {
+      const { data: { list, total } } = await getProComments(this.goodsId, 3) // 限制展示的商品的评价是3条
+      this.commentList = list // 存入评价列表
+      this.total = total // 存入评价总数
     }
   },
   created () {
     // 页面一创建, 立刻发送请求获取详细商品信息
     this.getDetail()
+    // 获取商品评价
+    this.getComments()
   }
 }
 

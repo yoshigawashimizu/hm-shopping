@@ -45,3 +45,18 @@ export const getProDetail = (goodsId = null) => { // 如果传入的 goodsId 商
     }
   })
 }
+
+/** 获取商品评价
+ * 请求路径: '/comment/listRows'
+ * 请求方法: get
+ * 请求传参: goodsId String 商品id 必需
+ *          limit String 获取评论展示数量 必需 默认为3
+ */
+export const getProComments = (goodsId, limit = 3) => { // 获取评论展示数量默认为3条
+  return request.get('/comment/listRows', {
+    params: {
+      goodsId, // 商品id
+      limit // 获取评论展示数量
+    }
+  })
+}
