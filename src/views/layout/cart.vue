@@ -13,7 +13,8 @@
     <!-- 购物车列表 -->
     <div class="cart-list">
       <div class="cart-item" v-for="item in cartList" :key="item.goods_id">
-        <van-checkbox :value="item.isChecked"></van-checkbox>
+        <!-- 复选框: 单项选择 -->
+        <van-checkbox :value="item.isChecked" @click="toggleCheck(item.goods_id)"></van-checkbox>
         <div class="show">
           <img :src="item.goods.goods_image" alt="">
         </div>
@@ -28,8 +29,10 @@
     </div>
 
     <div class="footer-fixed">
-      <div  class="all-check">
-        <van-checkbox  icon-size="18"></van-checkbox>
+      <!-- 全选按钮 -->
+      <!-- 点击触发"切换全选状态"事件, 形参为新的选中状态, 这里传入"已有全选状态"的取反, 即已全选 => 全不选, 未全选 => 被全选  -->
+      <div  class="all-check" @click="toggleAllCheck(!isAllChecked)">
+        <van-checkbox  icon-size="18" :value="isAllChecked"></van-checkbox>
         全选
       </div>
 
@@ -48,11 +51,12 @@
 
 <script>
 import CountBox from '@/components/CountBox.vue'// 导入计数盒子组件
-import { mapActions, mapState, mapGetters } from 'vuex' // 导入 vuex 提供的 map映射方法们
+import { mapActions, mapState, mapGetters, mapMutations } from 'vuex' // 导入 vuex 提供的 map映射方法们
 export default {
   name: 'cartIndex',
   methods: {
-    ...mapActions('cart', ['getCartAction']) // 导入 cart模块中的"获取"
+    ...mapActions('cart', ['getCartAction', 'toggleCheck']), // 导入 cart模块中的"获取购物车数据列表" 等方法
+    ...mapMutations('cart', ['toggleCheck', 'toggleAllCheck']) // 导入 cart 模块中的切换复选框选中状态 的方法
   },
   computed: {
     ...mapState('cart', ['cartList']), // 导入 cart模块中的购物车列表数据
@@ -60,7 +64,8 @@ export default {
       'cartTotal', // 所有商品的累加总数
       'selectedCartList', // 被选中的商品项
       'selectedCount', // 被选中的商品总数
-      'selectedPrice' // 被选中的商品的总价
+      'selectedPrice', // 被选中的商品的总价
+      'isAllChecked' // 商品是否被全选
     ])
   },
   created () {

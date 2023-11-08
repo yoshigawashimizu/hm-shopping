@@ -19,6 +19,25 @@ export default {
      */
     setCartList (state, cartList) {
       state.cartList = cartList // 存入购物车列表
+    },
+
+    /** 点击单项复选框, 切换商品选中状态; toggle 译为"切换"
+     *
+     * @param goodsId 被切换的商品项的商品id
+     */
+    toggleCheck (state, goodsId) {
+      const goods = state.cartList.find(item => item.goods_id === goodsId) // 获取被修改的商品的商品项
+      goods.isChecked = !goods.isChecked // 对自己的状态取反
+    },
+
+    /** 通过传入的 flag 的值, 切换全选状态.
+     * 传递过来的 flag, 其实就是组件页面中的 computed 中得到的 "是否被全选 isAllChecked"的值取反
+     * @param flag 复选框新状态
+    */
+    toggleAllCheck (state, flag) {
+      state.cartList.forEach(item => {
+        item.isChecked = flag
+      })
     }
   },
   actions: {
@@ -55,6 +74,10 @@ export default {
       return getters.selectedCartList.reduce((sum, item) => {
         return sum + item.goods_num * item.goods.goods_price_min // goods_num: 商品购买数 goods_price_min: 商品单价
       }, 0).toFixed(2) // 代码优化: 永远保留两位小数
+    },
+
+    isAllChecked (state) { // 购物车商品是否被全选, 是返回 true, 否则返回 false
+      return state.cartList.every(item => item.isChecked === true)
     }
   }
 }
