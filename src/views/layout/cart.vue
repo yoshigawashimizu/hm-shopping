@@ -53,7 +53,7 @@
         </div>
         <!-- 代码优化: 未选中任何商品, 按钮失活; css样式里提供了一个 disable 类, 当按钮不可用时切换 -->
         <div v-if="!isEdit" class="goPay" :class="{ disabled: selectedCount === 0 }">结算({{ selectedCount }})</div>
-        <div v-else class="delete" :class="{ disabled: selectedCount === 0 }">删除</div>
+        <div v-else class="delete" :class="{ disabled: selectedCount === 0 }" @click="handleDel">删除</div>
       </div>
     </div>
   </div>
@@ -72,12 +72,14 @@ export default {
   methods: {
     ...mapActions('cart', [
       'getCartAction', // 获取购物车列表数据
-      'changeCountAction' // 更新数据库里商品的购买数量
+      'changeCountAction', // 更新数据库里商品的购买数量
+      'delSelect' // 删除选中的商品
     ]),
     ...mapMutations('cart', [
       'toggleCheck', // 点击单项复选框, 切换商品选中状态
       'toggleAllCheck' // 通过传入的 flag 的值, 切换全选状态
     ]),
+
     /** 组件: 计数盒子发起的通知事件
      *
      * @param {*} goodsNum 当前商品购买数量
@@ -88,6 +90,19 @@ export default {
       console.log('当前商品购买数量:', goodsNum, '当前商品id:', goodsId, '当前商品规格SkuId:', goodsSkuId)
       // 调用 cart 模块中的 action 方法, 进行数量的修改
       this.changeCountAction({ goodsNum: goodsNum, goodsId: goodsId, goodsSku: goodsSkuId })
+    },
+
+    /** 点击删除按钮触发删除事件
+     *
+     */
+    async handleDel () {
+      // 非空判断: 当前选中的商品总数是否为0
+      if (this.selectedCount === 0) {
+        return
+      }
+      // 调用 cart 模块中的方法, 删除选中的商品项
+      await this.delSelect()
+      this.isEdit = false // 删除商品之后, 重置编辑模式为结算模式
     }
   },
   computed: {

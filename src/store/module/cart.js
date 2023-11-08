@@ -1,5 +1,6 @@
 // 这是购物车模块的状态管理的文件
-import { getCartList, changeCountApi } from '@/api/cart.js'// 导入获取购物车列表数据的api方法
+import { getCartList, changeCountApi, delSelectApi } from '@/api/cart.js'// 导入获取购物车列表数据的api方法
+import { Toast } from 'vant'
 export default {
   namespaced: true, // 开启名称空间
   state () {
@@ -68,6 +69,17 @@ export default {
       context.commit('changeCount', { goodsId: goodsId, goodsNum: goodsNum })
       // 再同步到后台
       await changeCountApi(goodsId, goodsNum, goodsSku) // 备注: 也许这里可以进行防抖优化
+    },
+
+    // 发送异步请求, 删除数据库里商品
+    async delSelect (context) {
+      const selectedCartList = context.getters.selectedCartList // 获取到被选中的商品的数组
+      // 取出"被选中的商品"的数组中的属性 → id , 存入新数组 cartIds 中
+      const cartIds = selectedCartList.map(item => item.id)
+      console.log(cartIds)
+      await delSelectApi(cartIds) // 调用后台 api 接口发送删除请求 特别注意! 如果 cardIds 为空, 会清空购物车!!!
+      Toast.success('删除成功') // 向用户通知反馈
+      context.dispatch('getCartAction') // 重新获取购物车数据
     }
   },
   getters: {

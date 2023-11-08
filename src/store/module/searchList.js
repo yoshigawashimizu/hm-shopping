@@ -28,7 +28,7 @@ export default {
       state.querySearch = obj.goodsName // 将用户输入的搜索关键字存入 state 中
       state.categoryId = obj.categoryId // 将分类页搜索关键字id categoryId 存入 state 中
       const { data: { list } } = await getProList(obj)
-      console.log('获取到的商品列表数组:', list) // 测试环境用, 搜索结构, 商品数据
+      // console.log('获取到的商品列表数组:', list) // 测试环境用, 搜索结构, 商品数据
       state.page = list.current_page
       state.proList = list.data
       state.total = list.total

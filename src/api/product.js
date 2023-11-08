@@ -21,7 +21,7 @@ export const getProList = (obj) => {
     goodsName = null, // 商品名称, 可选
     page = 1 // 页码, 默认为 1
   } = obj
-  console.log('结果排序规则:', sortType, '价格排序规则:', sortPrice, '分类页id:', categoryId, '商品名称:', goodsName, '当前页码', page) // 测试环境用, 发送请求前的请求传参是什么
+  // console.log('结果排序规则:', sortType, '价格排序规则:', sortPrice, '分类页id:', categoryId, '商品名称:', goodsName, '当前页码', page) // 测试环境用, 发送请求前的请求传参是什么
   return request.get('/goods/list', {
     params: {
       sortType,

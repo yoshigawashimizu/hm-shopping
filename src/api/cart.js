@@ -48,3 +48,16 @@ export const changeCountApi = (goodsId, goodsNum = 1, goodsSkuId = null) => {
     goodsSkuId // 商品SKU
   })
 }
+
+/** 删除购物车商品
+ * 请求路径: '/cart/clear'
+ * 请求方法: post
+ * 请求传参: (1) header 参数: Access-Token String 用户的 token 令牌 必需
+ *                           platform String 当前请求的客户端（APP、小程序、H5等） 默认 H5 必需
+ *          (2) body 参数: cartIds Array<String> 购物车商品项id们, 是"每一个购物车的商品项本身就是数组中的一项数据, 然后这项数据中有个id"中的id 必需
+ */
+export const delSelectApi = (cartIds = []) => {
+  return request.post('/cart/clear', {
+    cartIds // 购物车商品项id们
+  })
+}
