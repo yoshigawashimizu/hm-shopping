@@ -1,6 +1,7 @@
 // axios 的二次封装类
 // 这是小项目,所以只有一个基请求文件 request.js
 // 若是大型代码需要向多台不同的服务器发送请求时可以创建多个基请求文件 requestA requestB
+import store from '@/store' // 导入 vuex 状态管理
 import axios from 'axios'
 import { Toast } from 'vant' // 导入 toast 组件
 
@@ -8,7 +9,7 @@ import { Toast } from 'vant' // 导入 toast 组件
 // 好处: 不会污染原始的axios实例
 const instance = axios.create({
   baseURL: 'http://cba.itlike.com/public/index.php?s=/api/', // 基地址/路径前缀
-  timeout: 7000 // 超时时间
+  timeout: 10000 // 超时时间
   // headers: { 'X-Custom-Header': 'foobar' } // 请求头(暂时不需要)
 })
 
@@ -22,6 +23,15 @@ instance.interceptors.request.use(function (config) {
     forbidClick: true, // 禁用背景点击
     loadingType: 'spinner' // 配置loading图标
   })
+
+  // 优化代码: 往每一个请求的请求头里都添加token
+  const token = store.getters.token
+  // 判断: token是否存在
+  if (token) {
+    config.headers['Access-Token'] = token // config 请求时完整的配置信息对象, 用到了中括号语法, 将带特殊字符的 Access-Token 变量存入
+    config.headers.platform = 'H5'
+  }
+
   return config
 }, function (error) {
   // 对请求错误做些什么

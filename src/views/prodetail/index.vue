@@ -72,7 +72,9 @@
         <van-icon name="wap-home-o" />
         <span>首页</span>
       </div>
+      <!-- 购物车图标右上角角标 -->
       <div class="icon-cart">
+        <span v-if="cartTotal > 0" class="num">{{ cartTotal }}</span>
         <van-icon name="shopping-cart-o" />
         <span>购物车</span>
       </div>
@@ -118,19 +120,25 @@
 import { getProDetail, getProComments } from '@/api/product' // 导入'获取商品详细信息'等的方法
 import defaultImg from '@/assets/default-avatar.png' // 导入默认用户头像
 import CountBox from '@/components/CountBox.vue' // 导入通用组件记数盒子 CountBox
+import { addCart } from '@/api/cart' // 导入获取购物车数据的封装方法
 export default {
   name: 'ProdetailIndex', // 商品详情模块
   data () {
     return {
       images: [], // 轮播图图片, 其中 图片url 在 external_url 下, 图片id 在 file_id 下
       current: 0,
+
       detail: {}, // 商品详细信息
+      goodsSkuId: '', // 商品规格id
+
       total: 0, // 商品评价总数
       commentList: [], // 评价列表
       defaultImg, // 无头像用户的默认头像地址
       showPannel: false, // 底部"加入购物车"弹层的伸缩开关状态
       mode: 'cart', // 弹层状态, 通过状态管理弹层标题
-      addCount: 1 // 组件_计数盒子绑定的数据
+      addCount: 1, // 组件_计数盒子绑定的数据
+
+      cartTotal: 0 // 购物车总商品数角标
     }
   },
   computed: {
@@ -165,6 +173,7 @@ export default {
       const { data: { detail } } = await getProDetail(this.goodsId)
       this.detail = detail // 更新响应的"商品详细信息"数据
       this.images = detail.goods_images // 更新轮播图图片
+      this.goodsSkuId = detail.skuList[0].goods_sku_id// 更新商品规格id, 默认获取第一个商品规格
     },
     /** 获取商品详细页的评价
      *
@@ -176,7 +185,7 @@ export default {
     },
     /** 点击加入购物车按钮
     */
-    addCart () {
+    async addCart () {
       // 判断: token 是否存在 (1) 不存在, 弹框确认, (2) 存在, 继续请求操作
       // 提示: token 已被配置到全局
       if (!this.$store.getters.token) {
@@ -200,7 +209,11 @@ export default {
           .catch(() => {}) // 点击取消, 无逻辑处理
         return
       }
-      console.log('正常请求')
+      // 备注: 此处本应该有个步骤: 获取用户选择的商品规格, 即获取用户选择的 goods_sku_id 属性
+      const { data: { cartTotal } } = await addCart(this.goodsId, this.addCount, this.goodsSkuId) // 获取购物车数据
+      this.cartTotal = cartTotal // 购物车总商品数
+      this.$toast.success('加入成功') // 返回提示信息
+      this.showPannel = false // 关闭弹层
     }
   },
   created () {
@@ -409,6 +422,24 @@ export default {
   }
   .btn-none {
     background-color: #cccccc;
+  }
+}
+
+// 购物车右上角角标
+.footer .icon-cart {
+  position: relative;
+  padding: 0 6px;
+  .num {
+    z-index: 999;
+    position: absolute;
+    top: -2px;
+    right: 0;
+    min-width: 16px;
+    padding: 0 4px;
+    color: #fff;
+    text-align: center;
+    background-color: #ee0a24;
+    border-radius: 50%;
   }
 }
 </style>
