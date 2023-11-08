@@ -99,8 +99,9 @@
         </div>
       </div>
       <div class="num-box">
-      <span>数量</span>
-      数字框占位
+        <span>数量</span>
+        <!-- 计数盒子组件 -->
+        <CountBox v-model="addCount"></CountBox>
       </div>
       <!-- 有库存才显示购买按钮 -->
       <div class="showbtn" v-if="detail.stock_total > 0">
@@ -115,7 +116,8 @@
 
 <script>
 import { getProDetail, getProComments } from '@/api/product' // 导入'获取商品详细信息'等的方法
-import defaultImg from '@/assets/default-avatar.png'
+import defaultImg from '@/assets/default-avatar.png' // 导入默认用户头像
+import CountBox from '@/components/CountBox.vue' // 导入通用组件记数盒子 CountBox
 export default {
   name: 'ProdetailIndex', // 商品详情模块
   data () {
@@ -127,7 +129,8 @@ export default {
       commentList: [], // 评价列表
       defaultImg, // 无头像用户的默认头像地址
       showPannel: false, // 底部"加入购物车"弹层的伸缩开关状态
-      mode: 'cart' // 弹层状态, 通过状态管理弹层标题
+      mode: 'cart', // 弹层状态, 通过状态管理弹层标题
+      addCount: 1 // 组件_计数盒子绑定的数据
     }
   },
   computed: {
@@ -177,6 +180,9 @@ export default {
     this.getDetail()
     // 获取商品评价
     this.getComments()
+  },
+  components: {
+    CountBox // 计数盒子
   }
 }
 
