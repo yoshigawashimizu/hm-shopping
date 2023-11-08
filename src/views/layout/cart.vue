@@ -1,17 +1,20 @@
 <template>
   <div class="cart">
     <van-nav-bar title="购物车" fixed />
-    <!-- 购物车开头 -->
-    <div class="cart-title">
+
+    <!-- 这是用户成功登录, 且购物车有数据时才展示的盒子 -->
+    <div v-if="isLogin && cartList.length > 0 ">
+      <!-- 购物车开头 -->
+      <div class="cart-title">
       <span class="all">共<i>{{ cartTotal }}</i>件商品</span>
       <span class="edit">
         <van-icon name="edit" @click="isEdit=!isEdit"/>
         编辑
       </span>
-    </div>
+      </div>
 
-    <!-- 购物车列表 -->
-    <div class="cart-list">
+      <!-- 购物车列表 -->
+      <div class="cart-list">
       <div class="cart-item" v-for="item in cartList" :key="item.goods_id">
         <!-- 复选框: 单项选择 -->
         <van-checkbox :value="item.isChecked" @click="toggleCheck(item.goods_id)"></van-checkbox>
@@ -36,9 +39,10 @@
           </span>
         </div>
       </div>
-    </div>
+      </div>
 
-    <div class="footer-fixed">
+      <!-- 购物车底部 -->
+      <div class="footer-fixed">
       <!-- 全选按钮 -->
       <!-- 点击触发"切换全选状态"事件, 形参为新的选中状态, 这里传入"已有全选状态"的取反, 即已全选 => 全不选, 未全选 => 被全选  -->
       <div  class="all-check" @click="toggleAllCheck(!isAllChecked)">
@@ -55,6 +59,16 @@
         <div v-if="!isEdit" class="goPay" :class="{ disabled: selectedCount === 0 }">结算({{ selectedCount }})</div>
         <div v-else class="delete" :class="{ disabled: selectedCount === 0 }" @click="handleDel">删除</div>
       </div>
+      </div>
+    </div>
+
+    <!-- 这是用户未登录, 或者购物车无数据时才展示的盒子-->
+    <div class="empty-cart" v-else>
+      <img src="@/assets/empty.png" alt="">
+      <div class="tips">
+        您的购物车是空的, 快去逛逛吧
+      </div>
+      <div class="btn" @click="$router.push('/')">去逛逛</div>
     </div>
   </div>
 </template>
@@ -113,7 +127,10 @@ export default {
       'selectedCount', // 被选中的商品总数
       'selectedPrice', // 被选中的商品的总价
       'isAllChecked' // 商品是否被全选
-    ])
+    ]),
+    isLogin () { // 用户登录状态: 是否登录
+      return this.$store.getters.token // 有无拿到传递的 token
+    }
   },
   watch: {
     // 监视编辑模式变化
@@ -128,8 +145,8 @@ export default {
   },
   created () {
     // 判断: 页面加载时用户是否有登录
-    if (this.$store.getters.token) { // 通过 token 判断
-      this.getCartAction()
+    if (this.isLogin) { // 通过 token 判断
+      this.getCartAction() // 获取购物车列表数据
     }
   },
   components: {
@@ -272,5 +289,32 @@ export default {
     }
   }
 
+}
+
+// 空购物车样式
+.empty-cart {
+  padding: 80px 30px;
+  img {
+    width: 140px;
+    height: 92px;
+    display: block;
+    margin: 0 auto;
+  }
+  .tips {
+    text-align: center;
+    color: #666;
+    margin: 30px;
+  }
+  .btn {
+    width: 110px;
+    height: 32px;
+    line-height: 32px;
+    text-align: center;
+    background-color: #fa2c20;
+    border-radius: 16px;
+    color: #fff;
+    display: block;
+    margin: 0 auto;
+  }
 }
 </style>
