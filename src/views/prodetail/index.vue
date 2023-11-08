@@ -105,7 +105,7 @@
       </div>
       <!-- 有库存才显示购买按钮 -->
       <div class="showbtn" v-if="detail.stock_total > 0">
-        <div class="btn" v-if="mode === 'cart'">加入购物车</div>
+        <div class="btn" v-if="mode === 'cart'" @click="addCart">加入购物车</div>
         <div class="btn now" v-else>立刻购买</div>
       </div>
       <div class="btn-none" v-else>该商品已抢完</div>
@@ -173,6 +173,34 @@ export default {
       const { data: { list, total } } = await getProComments(this.goodsId, 3) // 限制展示的商品的评价是3条
       this.commentList = list // 存入评价列表
       this.total = total // 存入评价总数
+    },
+    /** 点击加入购物车按钮
+    */
+    addCart () {
+      // 判断: token 是否存在 (1) 不存在, 弹框确认, (2) 存在, 继续请求操作
+      // 提示: token 已被配置到全局
+      if (!this.$store.getters.token) {
+        // 弹框确认
+        this.$dialog.confirm({
+          title: '温馨提示', // title: 标题
+          message: '此时需要先登录才能继续操作哦', // message: 提示信息
+          confirmButtonText: '去登录', // confirmButtonText: 确定按钮文本
+          cancelButtonText: '再逛逛' // cancelButtonText: 取消按钮文本
+        })
+          .then(() => {
+            // 希望登录后能跳转回来, 需要在跳转去携带参数 (当前路径地址)
+            // this.$router.fullPath (会包含参数)当前路径地址 样式: /login?backUrl=%2Fprodetail%2F10039
+            this.$router.replace({ // 代码优化: 用 replace()方法替换 push()方法, 不保留历史
+              path: '/login', // 跳转地址
+              query: {
+                backUrl: this.$route.fullPath // backUrl: (路径传参自定义变量)回跳地址=当前路径地址
+              }
+            })
+          }) // 点击确定
+          .catch(() => {}) // 点击取消, 无逻辑处理
+        return
+      }
+      console.log('正常请求')
     }
   },
   created () {

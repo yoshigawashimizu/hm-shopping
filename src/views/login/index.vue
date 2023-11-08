@@ -137,10 +137,14 @@ export default {
       this.$store.commit('user/setUserInfo', res.data)
 
       // 提示用户登录成功
-      this.$toast.success('登录成功,即将跳转到主页面')
+      this.$toast.success('登录成功,即将跳转...')
       setTimeout(() => {
-        this.$router.push('/')
-      }, 1400) // 1.4 秒后跳转到主页面
+        // 判断: 地址栏是否有有回跳地址
+        // (1) 如果有 => 从其他页面拦截到登录页来的, 需要回跳
+        // (2) 如果没有 => 正常去首页
+        const url = this.$route.query.backUrl || '/'// 尝试获取回跳地址
+        this.$router.replace(url) // 代码优化: 用 replace()方法替换 push()方法, 不保留历史
+      }, 1400) // 1.4 秒后跳转
     }
   },
   destroyed () {
