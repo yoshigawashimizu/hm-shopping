@@ -13,8 +13,8 @@ import request from '@/utils/request'// 导入 axios 的二次封装类
  *                         isUsePoints Number 是否使用积分抵扣 （1使用 0不使用） 默认 0 可选
  *                         cartIds String 购物车ID集 可选
  *
- * @param mode 订单模式 购物车模式cart 立即购买 buyNow
- * @param obj 不同模式的不同传值: (1) cart 模式 → { cartIds } cartIds 购物车ID集 (2) buyNow 立即购买则传递 → { goodsId goodsNum goodsSkuId }
+ * @param {String} mode 订单模式 购物车模式cart 立即购买 buyNow
+ * @param {Object} obj 不同模式的不同传值: (1) cart 模式 → { cartIds } cartIds 购物车ID集 (2) buyNow 立即购买则传递 → { goodsId goodsNum goodsSkuId }
  */
 export const checkOrder = (mode, obj) => {
   const {
