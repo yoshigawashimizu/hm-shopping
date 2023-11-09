@@ -151,6 +151,21 @@ export default {
     /** 获取传递的购物车商品项 cartIds */
     cartIds () {
       return this.$route.query.cartIds
+    },
+
+    /** 获取的地址栏里传递的商品id goodsId */
+    goodsId () {
+      return this.$route.query.goodsId
+    },
+
+    /** 获取的地址栏里传递的商品数量 goodsNum */
+    goodsNum () {
+      return this.$route.query.goodsNum
+    },
+
+    /** 获取的地址栏里传递的商品规格id goodsSkuId */
+    goodsSkuId () {
+      return this.$route.query.goodsSkuId
     }
   },
   methods: {
@@ -168,13 +183,28 @@ export default {
 
     /** 发送请求, 获取结算订单 */
     async getOrderList () {
-      // 调用 api 方法, 传入 订单模式 与 传递的购物车商品项
-      const { data: { order, personal, setting } } = await checkOrder(this.mode, { cartIds: this.cartIds })
-      // console.log('生成的订单信息:', order, '用户信息:', personal, '积分信息:', setting) // 返回主体为: order: 生成的当前订单信息; setting: 积分; personal: 用户信息, 包括余额
-      this.order = order
-      this.personal = personal
-      this.setting = setting
+      // 判断: 订单模式 mode 是否是 cart 购物车模式
+      if (this.mode === 'cart') {
+        // 调用 api 方法, 传入 订单模式 与 传递的购物车商品项
+        const { data: { order, personal, setting } } = await checkOrder(this.mode, { cartIds: this.cartIds })
+        // console.log('生成的订单信息:', order, '用户信息:', personal, '积分信息:', setting) // 返回主体为: order: 生成的当前订单信息; setting: 积分; personal: 用户信息, 包括余额
+        this.order = order
+        this.personal = personal
+        this.setting = setting
+      } else if (this.mode === 'buyNow') {
+        // 调用 api 方法, 传入 订单模式 与 传递的购物车商品项
+        const { data: { order, personal, setting } } = await checkOrder(this.mode, {
+          goodsId: this.goodsId, // 购买的商品id
+          goodsNum: this.goodsNum, // 商品购买数量
+          goodsSkuId: this.goodsSkuId // 商品配置id
+        })
+        // console.log('生成的订单信息:', order, '用户信息:', personal, '积分信息:', setting) // 返回主体为: order: 生成的当前订单信息; setting: 积分; personal: 用户信息, 包括余额
+        this.order = order
+        this.personal = personal
+        this.setting = setting
+      }
     }
+
   },
 
   async created () {
