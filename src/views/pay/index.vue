@@ -87,7 +87,7 @@
 
   <!-- 买家留言 -->
   <div class="buytips">
-    <textarea placeholder="选填：买家留言（50字内）" name="" id="" cols="30" rows="10"></textarea>
+    <textarea placeholder="选填：买家留言（50字内）" name="" id="" cols="30" rows="10" v-model="remark"></textarea>
   </div>
     </div>
 
@@ -95,14 +95,14 @@
     <div class="footer-fixed">
       <div class="left">实付款：<span>￥{{ order.orderTotalPrice }}</span></div>
       <!-- 提交订单按钮 -->
-      <div class="tipsbtn">提交订单</div>
+      <div class="tipsbtn" @click="submitOrder">提交订单</div>
     </div>
   </div>
 </template>
 
 <script>
 import { getAddressListApi } from '@/api/address.js' // 导入'发送获取用户收货地址列表请求'方法
-import { checkOrder } from '@/api/order' // 导入 订单结算接口 的api接口封装方法
+import { checkOrder, submitOrderApi } from '@/api/order' // 导入 订单结算接口 的api接口封装方法
 
 export default {
   name: 'PayIndex', // 支付模块模块
@@ -127,7 +127,8 @@ export default {
       ],
       order: {}, // 生成的订单信息
       personal: {}, // 用户信息, 包括用户余额等
-      setting: {} // 用户积分相关
+      setting: {}, // 用户积分相关
+      remark: '' // 用户对商品的留言
     }
   },
   computed: {
@@ -141,9 +142,7 @@ export default {
       return region.province + region.city + region.region + this.selectedAddress.detail // 地址的字符串拼接: 省 + 实 + 区 + 详细地址
     },
 
-    /** 获取传递的支付方式 mode
-     *
-     */
+    /** 获取传递的支付方式 mode */
     mode () {
       return this.$route.query.mode // 获取路径中的 mode 传参
     },
@@ -178,7 +177,7 @@ export default {
       const { data: { list } } = await getAddressListApi() // 获取用户收货地址
       // 备注: 从服务器处无法拿到收货地址, 因此在此处将使用写死的默认地址
       this.addressList = list.length > 0 ? list : this.addressList
-      // console.log(this.addressList)
+      console.log(this.addressList)
     },
 
     /** 发送请求, 获取结算订单 */
@@ -203,8 +202,31 @@ export default {
         this.personal = personal
         this.setting = setting
       }
-    }
+    },
 
+    /** 点击按钮, 提交订单 */
+    async submitOrder () {
+      // 判断: 根据不同的 mode 发送不同的请求传参
+      if (this.mode === 'cart') {
+        // 调用 api 方法, 传入 订单模式 与 传递的购物车商品项
+        const res = await submitOrderApi(this.mode, {
+          cartIds: this.cartIds, // 购物车列表
+          remark: this.remark // 用户订单评价
+        })
+        console.log(res)
+      } else if (this.mode === 'buyNow') {
+        // 调用 api 方法, 传入 订单模式 与 传递的购物车商品项
+        const res = await submitOrderApi(this.mode, {
+          goodsId: this.goodsId, // 购买的商品id
+          goodsNum: this.goodsNum, // 商品购买数量
+          goodsSkuId: this.goodsSkuId, // 商品配置id
+          remark: this.remark // 用户订单评价
+        })
+        console.log(res)
+      }
+      this.$toast.success('支付成功')// 用户提示
+      this.$router.replace('/myorder')// 页面跳转
+    }
   },
 
   async created () {
