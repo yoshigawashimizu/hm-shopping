@@ -1,7 +1,9 @@
 // 按需引入,统一引入所需的的 vant-ui 组件
 import Vue from 'vue'
 
-import { Checkbox, Search, Swipe, SwipeItem, Grid, GridItem, Tabbar, TabbarItem, Icon, NavBar, Toast, Lazyload, Rate, ActionSheet, Dialog } from 'vant' // 这个步骤是不能少的
+import { Tab, Tabs, Checkbox, Search, Swipe, SwipeItem, Grid, GridItem, Tabbar, TabbarItem, Icon, NavBar, Toast, Lazyload, Rate, ActionSheet, Dialog } from 'vant' // 这个步骤是不能少的
+Vue.use(Tab) // XXX组件
+Vue.use(Tabs) // XXX组件
 Vue.use(Checkbox) // 复选框组件
 Vue.use(Tabbar) // 导航组件
 Vue.use(TabbarItem) // 导航组件

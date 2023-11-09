@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import TabbarComp from '@/components/tabbarComp.vue'
+import TabbarComp from '@/components/TabbarComp.vue'
 export default {
   name: 'LayoutIndex', // 首页架子模块
   components: {

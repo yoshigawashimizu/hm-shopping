@@ -95,3 +95,20 @@ export const submitOrderApi = (mode, obj) => {
     ...obj // 额外参数: 通过解构 obj 获取
   })
 }
+
+/** 获取我的订单
+ * 请求路径: '/order/list'
+ * 请求方法: get
+ * 请求传参: (1) header 参数: Access-Token String 用户的 token 令牌 必需
+ *                           platform String 当前请求的客户端（APP、小程序、H5等） 默认 H5 必需
+ *          (2) query 参数: dataType String 订单类型 all-全部，payment-待支付，delivery-待发货，received-待收货，comment-待评价 默认: all 必需
+ *                          page string 返回页码 默认为1 必需  备注, 可以使用 vant 组件的 List 组件
+ */
+export const getMyOrderListApi = (dataType = 'all', page = '1') => {
+  return request.get('/order/list', {
+    params: {
+      dataType, // 订单类型
+      page // 返回页码
+    }
+  })
+}
