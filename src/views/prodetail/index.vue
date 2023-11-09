@@ -123,8 +123,11 @@ import { getProDetail, getProComments } from '@/api/product' // 导入'获取商
 import defaultImg from '@/assets/default-avatar.png' // 导入默认用户头像
 import CountBox from '@/components/CountBox.vue' // 导入通用组件记数盒子 CountBox
 import { addCart } from '@/api/cart' // 导入获取购物车数据的封装方法
+import loginConfirm from '@/mixins/loginConfirm'// 导入 mixins "混入" 文件, 调用通用方法
+
 export default {
   name: 'ProdetailIndex', // 商品详情模块
+  mixins: [loginConfirm], // 导入混入
   data () {
     return {
       images: [], // 轮播图图片, 其中 图片url 在 external_url 下, 图片id 在 file_id 下
@@ -181,7 +184,7 @@ export default {
 
     /** 弹层中的点击 "加入购物车" 按钮 */
     async addCart () {
-      // 用户登录判断: 是否发送过弹窗
+      // 用户登录判断: 是否发送过弹窗  注意: 此处调用的是混入里的方法
       if (this.loginConfirm()) { // 发送过, 直接 return
         return
       }
@@ -194,7 +197,7 @@ export default {
 
     /** 点击 "立即购买" 按钮 */
     async goBuyNow () {
-      // 用户登录判断: 是否发送过弹窗
+      // 用户登录判断: 是否发送过弹窗  注意: 此处调用的是混入里的方法
       if (this.loginConfirm()) { // 发送过, 直接 return
         return
       }
@@ -207,38 +210,6 @@ export default {
           goodsNum: this.addCount // 商品购买数量
         }
       })
-    },
-
-    /** 用户登录确认
-     * 如果用户进行了加入购物车或者立即购买等操作, 则需要进行用户登录判断
-     * (1) 登录 → 不拦截, 返回 false !
-     * (2) 未登录 → 拦截, 返回 true !
-     */
-    loginConfirm () {
-      // 判断: token 是否存在 (1) 不存在, 弹框确认, (2) 存在, 继续请求操作
-      // 提示: token 已被配置到全局
-      if (!this.$store.getters.token) {
-        // 未登录, 弹框确认
-        this.$dialog.confirm({
-          title: '温馨提示', // title: 标题
-          message: '此时需要先登录才能继续操作哦', // message: 提示信息
-          confirmButtonText: '去登录', // confirmButtonText: 确定按钮文本
-          cancelButtonText: '再逛逛' // cancelButtonText: 取消按钮文本
-        })
-          .then(() => { // 点击确认, 跳转到登录页
-            // 希望登录后能跳转回来, 需要在跳转去携带参数 (当前路径地址)
-            // this.$router.fullPath (会包含参数)当前路径地址 样式: /login?backUrl=%2Fprodetail%2F10039
-            this.$router.replace({ // 代码优化: 用 replace()方法替换 push()方法, 不保留历史
-              path: '/login', // 跳转地址
-              query: {
-                backUrl: this.$route.fullPath // backUrl: (路径传参自定义变量)回跳地址=当前路径地址
-              }
-            })
-          }) // 点击确定
-          .catch(() => {}) // 点击取消, 无逻辑处理
-        return true // 确认已经显示了弹框
-      }
-      return false // 确认没有显示过弹框
     }
   },
 
