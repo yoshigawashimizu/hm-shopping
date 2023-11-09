@@ -96,6 +96,8 @@
 
 <script>
 import { getAddressListApi } from '@/api/address.js' // 导入'发送获取用户收货地址列表请求'方法
+import { checkOrder } from '@/api/order' // 导入 订单结算接口 的api接口封装方法
+
 export default {
   name: 'PayIndex', // 支付模块模块
   data () {
@@ -116,7 +118,10 @@ export default {
             region: '徐汇区'
           }
         }
-      ]
+      ],
+      order: {}, // 生成的订单信息
+      personal: {}, // 用户信息, 包括用户余额等
+      setting: {} // 用户积分相关
     }
   },
   computed: {
@@ -124,25 +129,54 @@ export default {
       // 这里的地址管理非主线业务, 所以直接以第一项为准
       return this.addressList[0] || {} // 未取到值时, 返回一个空对象
     },
+
     longAddress () { // 完整的收货地址
       const region = this.selectAddress.region
       return region.province + region.city + region.region + this.selectAddress.detail // 地址的字符串拼接: 省 + 实 + 区 + 详细地址
+    },
+
+    /** 获取传递的支付方式 mode
+     *
+     */
+    mode () {
+      return this.$route.query.mode // 获取路径中的 mode 传参
+    },
+
+    /** 获取传递的购物车商品项 cartIds */
+    cartIds () {
+      return this.$route.query.cartIds
     }
   },
   methods: {
+
     /** 存入/更新用户收货地址列表
-     *
+     * 备注: 从服务器处无法拿到收货地址, 因此该方法默认会返回一个固定地址
+     * 如果从服务器拿到了收货地址, 则会存储收货地址
      */
     async setAddressList () {
       const { data: { list } } = await getAddressListApi() // 获取用户收货地址
       // 备注: 从服务器处无法拿到收货地址, 因此在此处将使用写死的默认地址
       this.addressList = list.length > 0 ? list : this.addressList
       console.log(this.addressList)
+    },
+
+    /** 发送请求, 获取结算订单 */
+    async getOrderList () {
+      // 调用 api 方法, 传入 订单模式 与 传递的购物车商品项
+      const { data: { order, personal, setting } } = await checkOrder(this.mode, { cartIds: this.cartIds })
+      console.log('生成的订单信息:', order, '用户信息:', personal, '积分信息:', setting) // 返回主体为: order: 生成的当前订单信息; setting: 积分; personal: 用户信息, 包括余额
+      this.order = order
+      this.personal = personal
+      this.setting = setting
     }
   },
+
   async created () {
     // 一进入页面, 发送请求, 获取用户收货地址列表
     await this.setAddressList() // 调用'获取用户收货地址列表'方法
+    // 一进入页面, 方式请求, 获取结算订单
+
+    this.getOrderList()
   }
 }
 </script>
@@ -296,150 +330,3 @@ export default {
   }
 }
 </style>
-.pay {
-  padding-top: 46px;
-  padding-bottom: 46px;
-  ::v-deep {
-    .van-nav-bar__arrow {
-      color: #333;
-    }
-  }
-}
-.address {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 20px;
-  font-size: 14px;
-  color: #666;
-  position: relative;
-  background: url(@/assets/border-line.png) bottom repeat-x;
-  background-size: 60px auto;
-  .left-icon {
-    margin-right: 20px;
-  }
-  .right-icon {
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-7px);
-  }
-}
-.goods-item {
-  height: 100px;
-  margin-bottom: 6px;
-  padding: 10px;
-  background-color: #fff;
-  display: flex;
-  .left {
-    width: 100px;
-    img {
-      display: block;
-      width: 80px;
-      margin: 10px auto;
-    }
-  }
-  .right {
-    flex: 1;
-    font-size: 14px;
-    line-height: 1.3;
-    padding: 10px;
-    padding-right: 0px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
-    color: #333;
-    .info {
-      margin-top: 5px;
-      display: flex;
-      justify-content: space-between;
-      .price {
-        color: #fa2209;
-      }
-    }
-  }
-}
-
-.flow-num-box {
-  display: flex;
-  justify-content: flex-end;
-  padding: 10px 10px;
-  font-size: 14px;
-  border-bottom: 1px solid #efefef;
-  .money {
-    color: #fa2209;
-  }
-}
-
-.pay-cell {
-  font-size: 14px;
-  padding: 10px 12px;
-  color: #333;
-  display: flex;
-  justify-content: space-between;
-  .red {
-    color: #fa2209;
-  }
-}
-.pay-detail {
-  border-bottom: 1px solid #efefef;
-}
-
-.pay-way {
-  font-size: 14px;
-  padding: 10px 12px;
-  border-bottom: 1px solid #efefef;
-  color: #333;
-  .tit {
-    line-height: 30px;
-  }
-  .pay-cell {
-    padding: 10px 0;
-  }
-  .van-icon {
-    font-size: 20px;
-    margin-right: 5px;
-  }
-}
-
-.buytips {
-  display: block;
-  textarea {
-    display: block;
-    width: 100%;
-    border: none;
-    font-size: 14px;
-    padding: 12px;
-    height: 100px;
-  }
-}
-
-.footer-fixed {
-  position: fixed;
-  background-color: #fff;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 46px;
-  line-height: 46px;
-  border-top: 1px solid #efefef;
-  font-size: 14px;
-  display: flex;
-  .left {
-    flex: 1;
-    padding-left: 12px;
-    color: #666;
-    span {
-      color:#fa2209;
-    }
-  }
-  .tipsbtn {
-    width: 121px;
-    background: linear-gradient(90deg,#f9211c,#ff6335);
-    color: #fff;
-    text-align: center;
-    line-height: 46px;
-    display: block;
-    font-size: 14px;
-  }
-}

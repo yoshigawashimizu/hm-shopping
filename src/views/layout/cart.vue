@@ -56,7 +56,7 @@
           <span>¥ <i class="totalPrice">{{ selectedPrice }}</i></span>
         </div>
         <!-- 代码优化: 未选中任何商品, 按钮失活; css样式里提供了一个 disable 类, 当按钮不可用时切换 -->
-        <div v-if="!isEdit" class="goPay" :class="{ disabled: selectedCount === 0 }">结算({{ selectedCount }})</div>
+        <div v-if="!isEdit" class="goPay" :class="{ disabled: selectedCount === 0 }" @click="goPay">结算({{ selectedCount }})</div>
         <div v-else class="delete" :class="{ disabled: selectedCount === 0 }" @click="handleDel">删除</div>
       </div>
       </div>
@@ -117,6 +117,25 @@ export default {
       // 调用 cart 模块中的方法, 删除选中的商品项
       await this.delSelect()
       this.isEdit = false // 删除商品之后, 重置编辑模式为结算模式
+    },
+    /** 点击结算按钮, 触发结算事件
+     *
+     */
+    goPay () {
+      // 判断: 是否没有选中任何商品
+      if (this.selectedCount <= 0) {
+        this.$toast.fail('您还没有选中任何商品哦')// 给用户提示
+        return
+      }
+      const cartIds = this.selectedCartList.map(item => item.id).join(',')// 购物车商品项id 格式: String 'cartId1, cartId2, cartId3 ...'', 通过 .map() 与 .join() 方法实现
+      console.log(cartIds)
+      this.$router.push({
+        path: '/pay', // 跳转到 pay 页面
+        query: {
+          mode: 'cart', // 订单模式: 购物车模式
+          cartIds: cartIds// 格式正确的购物车商品项id
+        }
+      })
     }
   },
   computed: {
