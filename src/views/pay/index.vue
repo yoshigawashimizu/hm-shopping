@@ -9,13 +9,13 @@
         <van-icon name="logistics" />
       </div>
 
-      <div class="info" v-if="true">
+      <div class="info" v-if="selectAddress.address_id">
         <div class="info-content">
-          <span class="name">小红</span>
-          <span class="mobile">13811112222</span>
+          <span class="name">{{ selectAddress.name }}</span>
+          <span class="mobile">{{ selectAddress.phone }}</span>
         </div>
         <div class="info-address">
-          江苏省 无锡市 南长街 110号 504
+          {{ longAddress }}
         </div>
       </div>
 
@@ -95,8 +95,55 @@
 </template>
 
 <script>
+import { getAddressListApi } from '@/api/address.js' // 导入'发送获取用户收货地址列表请求'方法
 export default {
-  name: 'PayIndex' // 支付模块模块
+  name: 'PayIndex', // 支付模块模块
+  data () {
+    return {
+      addressList: [ // 用户收货地址列表 备注: 后台接口返回的值为空, 因此此处的用户收货地址列表将使用固定数据
+        {
+          address_id: 10012,
+          name: '张小',
+          phone: '18999292929',
+          province_id: 782,
+          city_id: 783,
+          region_id: 785,
+          detail: '北京路1号楼8888室',
+          user_id: 10003,
+          region: { // 省 市 区
+            province: '上海',
+            city: '上海市',
+            region: '徐汇区'
+          }
+        }
+      ]
+    }
+  },
+  computed: {
+    selectAddress () { // 被使用的用户收货地址
+      // 这里的地址管理非主线业务, 所以直接以第一项为准
+      return this.addressList[0] || {} // 未取到值时, 返回一个空对象
+    },
+    longAddress () { // 完整的收货地址
+      const region = this.selectAddress.region
+      return region.province + region.city + region.region + this.selectAddress.detail // 地址的字符串拼接: 省 + 实 + 区 + 详细地址
+    }
+  },
+  methods: {
+    /** 存入/更新用户收货地址列表
+     *
+     */
+    async setAddressList () {
+      const { data: { list } } = await getAddressListApi() // 获取用户收货地址
+      // 备注: 从服务器处无法拿到收货地址, 因此在此处将使用写死的默认地址
+      this.addressList = list.length > 0 ? list : this.addressList
+      console.log(this.addressList)
+    }
+  },
+  async created () {
+    // 一进入页面, 发送请求, 获取用户收货地址列表
+    await this.setAddressList() // 调用'获取用户收货地址列表'方法
+  }
 }
 </script>
 
