@@ -11,14 +11,11 @@ export default {
   mutations: {
     /** 设置购物车列表的方法
      *
-     * @param state 状态
-     * @param obj 传参
-     *            {
-     *              cartList: 购物车列表
-     *              cartTotal: 商品总数
-     *            }
+     * @param { Object } state 状态
+     * @param { Array } cartList 购物车列表
      */
     setCartList (state, cartList) {
+      console.log('新购物车列表:', cartList)
       state.cartList = cartList // 存入购物车列表
     },
 

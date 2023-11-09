@@ -25,20 +25,20 @@ export const getInfo = () => {
 
 /** 将数据存储在本地
  *
- * @param newUserInfo Object 新个人信息
+ * @param {Object} newUserInfo Object 新个人信息
  * {
  *  @param newToken String 新token令牌
  *  @param newUserId String 新用户 id
  * }
  */
 export const setInfo = (newUserInfo) => {
-  // 判断: 存入的新对象是否为空 或者存入的对象的内容为空格
-  if (!newUserInfo ||
-     (newUserInfo.token.trim() === '' &&
-      newUserInfo.userId.trim() === '')) {
+  const { token } = newUserInfo // 尝试解构出token
+  // 判断: 存入的新对象中是否没有token
+  if (!token) {
     console.log('存入本地的新对象为空, 将存储默认的对象: token: 空字符串,   userId: 空字符串')
     return localStorage.setItem(INFO_KEY, JSON.stringify(DEFAULT_INFO))
   }
+  console.log('存入本地的新用户消息不为空')
   return localStorage.setItem(INFO_KEY, JSON.stringify(newUserInfo))
 }
 
