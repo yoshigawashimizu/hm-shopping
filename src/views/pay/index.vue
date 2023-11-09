@@ -9,10 +9,10 @@
         <van-icon name="logistics" />
       </div>
 
-      <div class="info" v-if="selectAddress.address_id">
+      <div class="info" v-if="selectedAddress.address_id">
         <div class="info-content">
-          <span class="name">{{ selectAddress.name }}</span>
-          <span class="mobile">{{ selectAddress.phone }}</span>
+          <span class="name">{{ selectedAddress.name }}</span>
+          <span class="mobile">{{ selectedAddress.phone }}</span>
         </div>
         <div class="info-address">
           {{ longAddress }}
@@ -29,33 +29,39 @@
     </div>
 
     <!-- 订单明细 -->
-    <div class="pay-list">
+    <!-- 当订单中的的 goodsList 不为空, 即有商品时才渲染 -->
+    <div class="pay-list" v-if="order.goodsList">
       <div class="list">
-        <div class="goods-item">
+        <div class="goods-item" v-for="item in order.goodsList" :key="item.goods_id">
             <div class="left">
-              <img src="http://cba.itlike.com/public/uploads/10001/20230321/8f505c6c437fc3d4b4310b57b1567544.jpg" alt="" />
+              <img :src="item.goods_image" alt="" />
             </div>
             <div class="right">
               <p class="tit text-ellipsis-2">
-                 三星手机 SAMSUNG Galaxy S23 8GB+256GB 超视觉夜拍系统 超清夜景 悠雾紫 5G手机 游戏拍照旗舰机s23
+                <!-- 商品名称 -->
+                {{ item.goods_name }}
               </p>
               <p class="info">
-                <span class="count">x3</span>
-                <span class="price">¥9.99</span>
+                <!-- 商品购买总数 -->
+                <span class="count">x{{ item.total_num }}</span>
+                <!-- 商品购买总价 -->
+                <span class="price">¥{{ item.total_pay_price }}</span>
               </p>
             </div>
         </div>
       </div>
 
       <div class="flow-num-box">
-        <span>共 12 件商品，合计：</span>
-        <span class="money">￥1219.00</span>
+        <!-- 订单总商品数量 -->
+        <span>共 {{ order.orderTotalNum }} 件商品，合计：</span>
+        <!-- 订单总价 -->
+        <span class="money">￥{{ order.orderTotalPrice }}</span>
       </div>
 
       <div class="pay-detail">
         <div class="pay-cell">
           <span>订单总金额：</span>
-          <span class="red">￥1219.00</span>
+          <span class="red">￥{{ order.orderTotalPrice }}</span>
         </div>
 
         <div class="pay-cell">
@@ -65,30 +71,30 @@
 
         <div class="pay-cell">
           <span>配送费用：</span>
-          <span v-if="false">请先选择配送地址</span>
+          <span v-if="!selectedAddress">请先选择配送地址</span>
           <span v-else class="red">+￥0.00</span>
         </div>
       </div>
 
-      <!-- 支付方式 -->
-      <div class="pay-way">
-        <span class="tit">支付方式</span>
-        <div class="pay-cell">
-          <span><van-icon name="balance-o" />余额支付（可用 ¥ 999919.00 元）</span>
-          <!-- <span>请先选择配送地址</span> -->
-          <span class="red"><van-icon name="passed" /></span>
-        </div>
-      </div>
+  <!-- 支付方式 -->
+  <div class="pay-way">
+    <span class="tit">支付方式</span>
+    <div class="pay-cell">
+      <span><van-icon name="balance-o" />余额支付（可用 ¥ {{ personal.balance }} 元）</span>
+      <span class="red"><van-icon name="passed" /></span>
+    </div>
+  </div>
 
-      <!-- 买家留言 -->
-      <div class="buytips">
-        <textarea placeholder="选填：买家留言（50字内）" name="" id="" cols="30" rows="10"></textarea>
-      </div>
+  <!-- 买家留言 -->
+  <div class="buytips">
+    <textarea placeholder="选填：买家留言（50字内）" name="" id="" cols="30" rows="10"></textarea>
+  </div>
     </div>
 
     <!-- 底部提交 -->
     <div class="footer-fixed">
-      <div class="left">实付款：<span>￥999919</span></div>
+      <div class="left">实付款：<span>￥{{ order.orderTotalPrice }}</span></div>
+      <!-- 提交订单按钮 -->
       <div class="tipsbtn">提交订单</div>
     </div>
   </div>
@@ -125,14 +131,14 @@ export default {
     }
   },
   computed: {
-    selectAddress () { // 被使用的用户收货地址
+    selectedAddress () { // 被使用的用户收货地址
       // 这里的地址管理非主线业务, 所以直接以第一项为准
       return this.addressList[0] || {} // 未取到值时, 返回一个空对象
     },
 
     longAddress () { // 完整的收货地址
-      const region = this.selectAddress.region
-      return region.province + region.city + region.region + this.selectAddress.detail // 地址的字符串拼接: 省 + 实 + 区 + 详细地址
+      const region = this.selectedAddress.region
+      return region.province + region.city + region.region + this.selectedAddress.detail // 地址的字符串拼接: 省 + 实 + 区 + 详细地址
     },
 
     /** 获取传递的支付方式 mode
@@ -157,14 +163,14 @@ export default {
       const { data: { list } } = await getAddressListApi() // 获取用户收货地址
       // 备注: 从服务器处无法拿到收货地址, 因此在此处将使用写死的默认地址
       this.addressList = list.length > 0 ? list : this.addressList
-      console.log(this.addressList)
+      // console.log(this.addressList)
     },
 
     /** 发送请求, 获取结算订单 */
     async getOrderList () {
       // 调用 api 方法, 传入 订单模式 与 传递的购物车商品项
       const { data: { order, personal, setting } } = await checkOrder(this.mode, { cartIds: this.cartIds })
-      console.log('生成的订单信息:', order, '用户信息:', personal, '积分信息:', setting) // 返回主体为: order: 生成的当前订单信息; setting: 积分; personal: 用户信息, 包括余额
+      // console.log('生成的订单信息:', order, '用户信息:', personal, '积分信息:', setting) // 返回主体为: order: 生成的当前订单信息; setting: 积分; personal: 用户信息, 包括余额
       this.order = order
       this.personal = personal
       this.setting = setting
