@@ -82,7 +82,7 @@
       <div class="btn-buy" @click="buyFn">立刻购买</div>
     </div>
 
-    <!-- 弹层: 添加到购物车 -->
+    <!-- 弹层: 添加到购物车/立即购买 共用弹层 -->
     <van-action-sheet v-model="showPannel" :title="mode === 'cart'? '加入购物车' : '立即购买' ">
       <div class="product">
       <div class="product-title">
@@ -105,11 +105,13 @@
         <!-- 计数盒子组件 -->
         <CountBox v-model="addCount"></CountBox>
       </div>
-      <!-- 有库存才显示购买按钮 -->
+      <!-- 有库存: 显示购买按钮 -->
       <div class="showbtn" v-if="detail.stock_total > 0">
         <div class="btn" v-if="mode === 'cart'" @click="addCart">加入购物车</div>
-        <div class="btn now" v-else>立刻购买</div>
+        <div class="btn now" v-else @click="goBuyNow">立刻购买</div>
       </div>
+
+      <!-- 无库存: 显示不可购买按钮 -->
       <div class="btn-none" v-else>该商品已抢完</div>
       </div>
     </van-action-sheet>
@@ -148,16 +150,12 @@ export default {
     }
   },
   methods: {
-    /** 加入购物车按钮的点击事件
-     *
-     */
+    /** 加入购物车按钮的点击事件 */
     addFn () {
       this.mode = 'cart' // 切换弹层状态为cart
       this.showPannel = true // 开启弹层
     },
-    /** 立即购买按钮的点击事件
-     *
-     */
+    /** 立即购买按钮的点击事件 */
     buyFn () {
       this.mode = 'buyNow' // 切换弹层状态为buy
       this.showPannel = true // 开启弹层
@@ -166,37 +164,68 @@ export default {
     onChange (index) {
       this.current = index
     },
-    /** 获取商品详细页的所有数据, 包括商品信息等等
-     *
-    */
+    /** 获取商品详细页的所有数据, 包括商品信息等等 */
     async getDetail () {
       const { data: { detail } } = await getProDetail(this.goodsId)
       this.detail = detail // 更新响应的"商品详细信息"数据
       this.images = detail.goods_images // 更新轮播图图片
       this.goodsSkuId = detail.skuList[0].goods_sku_id// 更新商品规格id, 默认获取第一个商品规格
     },
-    /** 获取商品详细页的评价
-     *
-    */
+
+    /** 获取商品详细页的评价 */
     async getComments () {
       const { data: { list, total } } = await getProComments(this.goodsId, 3) // 限制展示的商品的评价是3条
       this.commentList = list // 存入评价列表
       this.total = total // 存入评价总数
     },
-    /** 点击加入购物车按钮
-    */
+
+    /** 弹层中的点击 "加入购物车" 按钮 */
     async addCart () {
+      // 用户登录判断: 是否发送过弹窗
+      if (this.loginConfirm()) { // 发送过, 直接 return
+        return
+      }
+      // 备注: 此处本应该有个步骤: 获取用户选择的商品规格, 即获取用户选择的goods_sku_id 属性
+      const { data: { cartTotal } } = await addCart(this.goodsId, this.addCount, this.goodsSkuId) // 获取购物车数据
+      this.cartTotal = cartTotal // 购物车总商品数
+      this.$toast.success('加入成功') // 返回提示信息
+      this.showPannel = false // 关闭弹层
+    },
+
+    /** 点击 "立即购买" 按钮 */
+    async goBuyNow () {
+      // 用户登录判断: 是否发送过弹窗
+      if (this.loginConfirm()) { // 发送过, 直接 return
+        return
+      }
+      this.$router.push({
+        path: '/pay', // 跳转到 订单支付页面 pay
+        query: {
+          mode: 'buyNow', // 支付模式为 立即购买
+          goodsId: this.goodsId, // 商品id
+          goodsSkuId: this.goodsSkuId, // 商品规格id
+          goodsNum: this.addCount // 商品购买数量
+        }
+      })
+    },
+
+    /** 用户登录确认
+     * 如果用户进行了加入购物车或者立即购买等操作, 则需要进行用户登录判断
+     * (1) 登录 → 不拦截, 返回 false !
+     * (2) 未登录 → 拦截, 返回 true !
+     */
+    loginConfirm () {
       // 判断: token 是否存在 (1) 不存在, 弹框确认, (2) 存在, 继续请求操作
       // 提示: token 已被配置到全局
       if (!this.$store.getters.token) {
-        // 弹框确认
+        // 未登录, 弹框确认
         this.$dialog.confirm({
           title: '温馨提示', // title: 标题
           message: '此时需要先登录才能继续操作哦', // message: 提示信息
           confirmButtonText: '去登录', // confirmButtonText: 确定按钮文本
           cancelButtonText: '再逛逛' // cancelButtonText: 取消按钮文本
         })
-          .then(() => {
+          .then(() => { // 点击确认, 跳转到登录页
             // 希望登录后能跳转回来, 需要在跳转去携带参数 (当前路径地址)
             // this.$router.fullPath (会包含参数)当前路径地址 样式: /login?backUrl=%2Fprodetail%2F10039
             this.$router.replace({ // 代码优化: 用 replace()方法替换 push()方法, 不保留历史
@@ -207,15 +236,12 @@ export default {
             })
           }) // 点击确定
           .catch(() => {}) // 点击取消, 无逻辑处理
-        return
+        return true // 确认已经显示了弹框
       }
-      // 备注: 此处本应该有个步骤: 获取用户选择的商品规格, 即获取用户选择的 goods_sku_id 属性
-      const { data: { cartTotal } } = await addCart(this.goodsId, this.addCount, this.goodsSkuId) // 获取购物车数据
-      this.cartTotal = cartTotal // 购物车总商品数
-      this.$toast.success('加入成功') // 返回提示信息
-      this.showPannel = false // 关闭弹层
+      return false // 确认没有显示过弹框
     }
   },
+
   created () {
     // 页面一创建, 立刻发送请求获取详细商品信息
     this.getDetail()
