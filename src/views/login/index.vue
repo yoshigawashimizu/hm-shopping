@@ -61,7 +61,7 @@ export default {
     this.getPicCode()
   },
   methods: {
-    // 获取图形验证码
+    /** 获取图形验证码 */
     async getPicCode () {
       const { data: { base64, key } } = await getPicCode()
       // 解构出的对象:
@@ -71,7 +71,7 @@ export default {
       this.picKey = key // 存储唯一标识
     },
 
-    // 点击获取短信验证码
+    /** 点击获取短信验证码 */
     async getCode () {
       // 判断: 用户输入的 手机号 与 图形验证码 没有通过校验
       if (!this.validFn()) {
@@ -82,8 +82,10 @@ export default {
       if (!this.timer && (this.totalSecond === this.second)) {
         // 发送短信验证码
         await getMsgCode(this.picCode, this.picKey, this.mobile)
+
         // 轻提示: 告诉用户验证码发送成功
         this.$toast.success('验证码短信发送成功,请注意查收')
+
         // 开启短信倒计时, 每隔1s当前秒数减一
         this.timer = setInterval(() => {
           this.second--
@@ -108,21 +110,21 @@ export default {
         this.$toast.fail('请输入正确格式的手机号')
         return false
       }
+
       // 判断: 用户输入的验证码是否不符合: 仅包含4个字毞字符（字母、数字或下划线）的字符串
       if (!/^\w{4}$/.test(this.picCode)) {
         this.$toast.fail('请输入正确的图形验证码')
         return false
       }
+
       return true
     },
 
-    /** 点击登录按钮进行登录
-     *
-     */
+    /** 点击登录按钮进行登录 */
     async login () {
       // 判断: 用户输入的手机号与验证码格式是否未通过校验
       if (!this.validFn()) {
-        return
+        return // 未通过, 无操作
       }
 
       // 判断: 短信验证码是否不符合格式
@@ -138,11 +140,12 @@ export default {
 
       // 提示用户登录成功
       this.$toast.success('登录成功,即将跳转...')
+
       setTimeout(() => {
         // 判断: 地址栏是否有有回跳地址
-        // (1) 如果有 => 从其他页面拦截到登录页来的, 需要回跳
+        // (1) 如果有 => 从其他页面拦截到登录页来的, 需要回跳, 回跳地址以路径传参的方式传入, 参数名称为 backUrl
         // (2) 如果没有 => 正常去首页
-        const url = this.$route.query.backUrl || '/'// 尝试获取回跳地址
+        const url = this.$route.query.backUrl || '/' // 尝试获取回跳地址
         this.$router.replace(url) // 代码优化: 用 replace()方法替换 push()方法, 不保留历史
       }, 1400) // 1.4 秒后跳转
     }

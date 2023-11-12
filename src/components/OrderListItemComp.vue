@@ -1,36 +1,58 @@
 <!-- 订单展示框组件 -->
 <template>
   <div class="order-list-item" v-if="item.order_id">
+
+    <!-- 头部区域 -->
     <div class="tit">
+
+      <!-- 订单创建事件 -->
       <div class="time">{{ item.create_time }}</div>
+
+      <!-- 订单状态: 待支付/待发货/待收货/待评价 -->
       <div class="status">
         <span>{{ item.state_text }}</span>
       </div>
     </div>
+
+    <!-- 主体区域 -->
     <div class="list" >
       <div class="list-item" v-for="(goods, index) in item.goods" :key="index">
+
+        <!-- 商品图片 -->
         <div class="goods-img">
           <img :src="goods.goods_image" alt="">
         </div>
+
+        <!-- 商品描述文本 -->
         <div class="goods-content text-ellipsis-2">
           {{ goods.goods_name }}
         </div>
+
+        <!-- 商品购买信息 -->
         <div class="goods-trade">
+          <!-- 商品总价 -->
           <p>¥ {{ goods.total_pay_price }}</p>
+          <!-- 商品总购买数 -->
           <p>x {{ goods.total_num }}</p>
         </div>
       </div>
     </div>
-    <!-- 订单总数 & 订单总金额 -->
+    <!-- 单次下单的 订单总数 & 订单总金额 -->
     <div class="total">
       共 {{ item.total_num }} 件商品，总金额 ¥{{ item.total_price }}
     </div>
+
+    <!-- 订单操作按钮 -->
     <div class="actions">
+      <!-- 显示条件: 订单状态为 10, 未收货 -->
       <div v-if="item.order_status === 10">
+        <!-- 显示条件: 支付状态为10, 未支付 -->
         <span v-if="item.pay_status === 10">立刻付款</span>
         <span v-else-if="item.delivery_status === 10">申请取消</span>
         <span v-else-if="item.delivery_status === 20 || item.delivery_status === 30">确认收货</span>
       </div>
+
+      <!-- 显示条件: 订单状态为30, 已收货 -->
       <div v-if="item.order_status === 30">
         <span>评价</span>
       </div>

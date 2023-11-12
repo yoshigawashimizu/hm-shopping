@@ -36,19 +36,21 @@
 
 <script>
 import { getCategoryData } from '@/api/category' // 导入'获取分类页数据'方法
+
 export default {
   name: 'categoryIndex', // 二级路由, 分页类组件
   created () {
-    this.getCategoryList() // 页面加载时, 获取到分类页数据
+    this.setCategoryList() // 页面加载时, 获取到分类页数据
   },
   data () {
     return {
       list: [], // 分类页数据集合
-      activeIndex: 0 //
+      activeIndex: 0 // 左侧大分类的激活索引
     }
   },
   methods: {
-    async getCategoryList () { // 获取分类页数据并赋值存储
+    /** 存储/更新分类页数据 */
+    async setCategoryList () {
       const { data: { list } } = await getCategoryData()
       this.list = list
     }

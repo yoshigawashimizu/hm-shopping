@@ -1,16 +1,17 @@
-// 首页相关的 api 封装方法
+// 请求'首页相关数据'的二次封装类
 import request from '@/utils/request.js' // 导入 axios 的二次封装类
 
-/** 获取首页设计
+/** 获取首页数据
  * 请求路径: '/page/detail'
  * 请求方法: get
- * 请求传参: pageId string 页面id默认就用0
+ * 请求传参: pageId Number 页面id, 默认为 0
+ *
+ * @param {Number} pageId 页面id
  */
-export const getHomeData = () => {
+export const getHomeData = (pageId = 0) => {
   return request.get('/page/detail', {
-    // 注意, get 传参放在params里
-    params: {
-      pageId: 0
+    params: { // 注意, get 请求方法传参, 参数放在 params 对象里
+      pageId
     }
   })
 }

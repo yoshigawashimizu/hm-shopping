@@ -10,28 +10,31 @@ import { Toast } from 'vant' // 导入 toast 组件
 const instance = axios.create({
   baseURL: 'http://cba.itlike.com/public/index.php?s=/api/', // 基地址/路径前缀
   timeout: 10000 // 超时时间
-  // headers: { 'X-Custom-Header': 'foobar' } // 请求头(暂时不需要)
+  // headers: { 'X-Custom-Header': 'foobar' } // 设置请求头 (暂时不需要)
 })
 
-// 自定义配置 - 请求拦截器/响应拦截器
+// 请求拦截器/响应拦截器
+
 // 添加请求拦截器
 instance.interceptors.request.use(function (config) {
-  // (1) 添加loading效果 (2) 禁止背景点击(节流处理, 防止多次无效触发)
+  /** 页面优化: toast 轻提示优化
+   * (1) 添加loading效果
+   * (2) 禁止背景点击(节流处理, 防止多次无效触发)
+   */
   Toast.loading({
     duration: 0, // toast显示时长, 默认为2秒, 0为永不消失
-    message: '加载中...', // 加载提示
+    message: '加载中...', // 提示文本
     forbidClick: true, // 禁用背景点击
     loadingType: 'spinner' // 配置loading图标
   })
 
   // 优化代码: 往每一个请求的请求头里都添加token
-  const token = store.getters.token
+  const token = store.getters.token // 尝试获取 token 令牌
   // 判断: token是否存在
   if (token) {
     config.headers['Access-Token'] = token // config 请求时完整的配置信息对象, 用到了中括号语法, 将带特殊字符的 Access-Token 变量存入
-    config.headers.platform = 'H5'
+    config.headers.platform = 'H5' // 设置请求头: platform 平台信息
   }
-
   return config
 }, function (error) {
   // 对请求错误做些什么

@@ -14,7 +14,7 @@ export default {
   mutations: {
     /** 点击搜索按钮, 通过关键字进行商品搜索
      *
-     * @param {*} key String 搜索的关键字
+     * @param {String} key  搜索的关键字
      */
     goSearch (state, key) {
       // 非空判断: 输入的搜索内容是否为空
@@ -23,12 +23,12 @@ export default {
         return
       }
       const index = state.history.indexOf(key) // 查询搜索的关键字在历史数组中的索引位置
-      // 判断: 找到的索引是否不为 -1(即有找到历史中的关键字)
+
+      // 判断: 找到的索引是否不为 -1 (即在历史记录列表中找到相同的关键字)
       if (index !== -1) {
-        // 将原有关键字移除
-        state.history.splice(index, 1) // 从 index 索引位置开始, 删除1个
+        state.history.splice(index, 1) // 将原有关键字移除: 从 index 索引位置开始, 删除1个
       }
-      state.history.unshift(key) // 将搜索关键字添加到第1个位置
+      state.history.unshift(key) // 将搜索关键字添加到数组第1个位置
 
       setHistoryList(state.history) // 将搜索历史存入本地
 
@@ -37,21 +37,16 @@ export default {
 
     /** 传递输入框内容, 更新 state 中的 search 变量
      *
-     * @param newSearchKey 输入框内容
+     * @param {String} newSearchKey 输入框内容
      */
     updateSearch (state, newSearchKey) {
       state.search = newSearchKey
     },
-    /** 清空搜索历史
-     *
-     */
+
+    /** 清空搜索历史 */
     clearHistory (state) {
-      state.history = []
-      setHistoryList([])
+      state.history = [] // 将 search 模块中的 history 变量重置为空数组
+      setHistoryList([]) // 将本地存储的历史记录列表清空
     }
-  },
-  actions: {
-  },
-  getters: {
   }
 }

@@ -1,3 +1,4 @@
+<!-- 首页底部的四个导航按钮 -->
 <template>
   <!-- route 属性:开启 vue-router 的路由导航 -->
   <van-tabbar v-model="active" active-color="#ee0a24" inactive-color="#000" route>

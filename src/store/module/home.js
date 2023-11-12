@@ -13,20 +13,14 @@ export default {
     }
   },
   mutations: {
-    // 设置首页数据
+    // 设置/存入/更新首页数据
     async setHomeData (state) {
-      const { data: { pageData } } = await getHomeData()
+      const { data: { pageData } } = await getHomeData() // 发送请求, 获取到首页数据
       state.page = pageData.page // 存储页面配置
-      // console.log('是否获取到了page页面配置:', state.page)
       state.items = pageData.items // 存储页面配置项
-      // console.log('是否获取到了items页面配置项数组:', state.items)
       state.bannerList = pageData.items[1].data // 存储轮播图数据
       state.navBarList = pageData.items[3].data // 导航数据
       state.proList = pageData.items[6].data // 商品数据
     }
-  },
-  actions: {
-  },
-  getters: {
   }
 }

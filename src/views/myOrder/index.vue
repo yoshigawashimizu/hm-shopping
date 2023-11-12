@@ -27,16 +27,19 @@ export default {
     }
   },
   methods: {
-    async getOrderList () { // 发送请求, 获取订单列表
+    /** 发送请求, 获取订单列表 */
+    async getOrderList () {
       const { data: { list } } = await getMyOrderListApi(this.active, this.page)
-      // 后台没有返回商品总数, 所以这里手动的进行了累加
+
+      // 后台没有返回商品总数, 所以这里手动添加了一个新变量 total_num 商品总数
       list.data.forEach((item) => {
         item.total_num = 0 // 声明一个新变量total_num: 商品总数
+
         item.goods.forEach(goods => { // 遍历: 累加每个订单的购买总数为全部商品总数
           item.total_num += goods.total_num // 取得商品总数
         })
       })
-      this.list = list.data
+      this.list = list.data // 将加入 '商品总数' 后的新数组存入 data
     }
   },
   watch: {
@@ -48,7 +51,7 @@ export default {
     }
   },
   components: {
-    OrderListItemComp
+    OrderListItemComp // 订单展示组件
   }
 }
 </script>

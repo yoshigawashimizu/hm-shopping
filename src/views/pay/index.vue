@@ -132,12 +132,14 @@ export default {
     }
   },
   computed: {
-    selectedAddress () { // 被使用的用户收货地址
+    /** 被使用的/提交时的用户收货地址 */
+    selectedAddress () {
       // 这里的地址管理非主线业务, 所以直接以第一项为准
       return this.addressList[0] || {} // 未取到值时, 返回一个空对象
     },
 
-    longAddress () { // 完整的收货地址
+    /** 获取完整的收货地址 */
+    longAddress () {
       const region = this.selectedAddress.region
       return region.province + region.city + region.region + this.selectedAddress.detail // 地址的字符串拼接: 省 + 实 + 区 + 详细地址
     },
@@ -180,8 +182,8 @@ export default {
       console.log(this.addressList)
     },
 
-    /** 发送请求, 获取结算订单 */
-    async getOrderList () {
+    /** 发送请求, 获取/更新结算订单数据 */
+    async setOrderList () {
       // 判断: 订单模式 mode 是否是 cart 购物车模式
       if (this.mode === 'cart') {
         // 调用 api 方法, 传入 订单模式 与 传递的购物车商品项
@@ -193,9 +195,9 @@ export default {
       } else if (this.mode === 'buyNow') {
         // 调用 api 方法, 传入 订单模式 与 传递的购物车商品项
         const { data: { order, personal, setting } } = await checkOrder(this.mode, {
-          goodsId: this.goodsId, // 购买的商品id
-          goodsNum: this.goodsNum, // 商品购买数量
-          goodsSkuId: this.goodsSkuId // 商品配置id
+          goodsId: this.goodsId, // 购买的商品id, 路径传参
+          goodsNum: this.goodsNum, // 商品购买数量, 路径传参
+          goodsSkuId: this.goodsSkuId // 商品配置id, 路径传参
         })
         // console.log('生成的订单信息:', order, '用户信息:', personal, '积分信息:', setting) // 返回主体为: order: 生成的当前订单信息; setting: 积分; personal: 用户信息, 包括余额
         this.order = order
@@ -209,20 +211,18 @@ export default {
       // 判断: 根据不同的 mode 发送不同的请求传参
       if (this.mode === 'cart') {
         // 调用 api 方法, 传入 订单模式 与 传递的购物车商品项
-        const res = await submitOrderApi(this.mode, {
+        await submitOrderApi(this.mode, {
           cartIds: this.cartIds, // 购物车列表
           remark: this.remark // 用户订单评价
         })
-        console.log(res)
       } else if (this.mode === 'buyNow') {
         // 调用 api 方法, 传入 订单模式 与 传递的购物车商品项
-        const res = await submitOrderApi(this.mode, {
+        await submitOrderApi(this.mode, {
           goodsId: this.goodsId, // 购买的商品id
           goodsNum: this.goodsNum, // 商品购买数量
           goodsSkuId: this.goodsSkuId, // 商品配置id
           remark: this.remark // 用户订单评价
         })
-        console.log(res)
       }
       this.$toast.success('支付成功')// 用户提示
       this.$router.replace('/myorder')// 页面跳转
@@ -234,7 +234,7 @@ export default {
     await this.setAddressList() // 调用'获取用户收货地址列表'方法
     // 一进入页面, 方式请求, 获取结算订单
 
-    this.getOrderList()
+    this.setOrderList()
   }
 }
 </script>

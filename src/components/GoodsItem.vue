@@ -1,22 +1,29 @@
 <!-- 组件: "猜你喜欢","商品搜索结果"商品展示框 -->
 <template>
-  <!-- 判断: 商品的id goods_id 存在 -->
+  <!-- 显示条件: 商品的id goods_id 存在 -->
   <div class="goods-item" @click="$router.push(`/prodetail/${item.goods_id}`)" v-if="item.goods_id">
     <div class="left">
       <!-- 商品图片 -->
       <img :src="item.goods_image" alt="" />
     </div>
     <div class="right">
+
+      <!-- 商品名称 -->
       <p class="tit text-ellipsis-2">
-        <!-- 商品名称 -->
         {{ item.goods_name }}
       </p>
+
+      <!-- 已售数量 -->
       <p class="count">已售{{ item.goods_sales }}件</p>
+
+      <!-- 商品价格 -->
       <p class="price">
+
         <!-- 原价 -->
         <span class="new">¥{{ item.goods_price_min }}</span>
         <!-- 现价/折扣价 -->
         <span class="old">¥{{ item.goods_price_max }}</span>
+
       </p>
     </div>
   </div>
@@ -26,10 +33,9 @@
 export default {
   name: 'GoodsItem', // 商品展示框组件
   props: {
-    // 数据父传子, 使用的属性名为 item
-    item: {
+    item: { // 数据父传子, 使用的属性名为 item
       type: Object,
-      default: () => { // 如果默认值是对象, 则设置默认值时使用函数设置默认值, 不可以直接{}
+      default: () => { // 备注: 当想要设置默认值为"一个对象"时, 不可以直接使用 "{}", 而是使用函数设置默认值 "default: () => { return {} }"
         return {}
       }
     }

@@ -9,17 +9,11 @@ import cart from '@/store/module/cart' // 导入搜索结果列表模块 searchL
 Vue.use(Vuex)
 
 export default new Vuex.Store({
-  state: {
-  },
   getters: {
-    // 获取 token, token 从 user 模块中获取会方便一些
+    // 获取 token 令牌, 存入vuex 的全局状态; token 从 user 模块中获取会方便一些
     token (state) {
       return state.user.userInfo.token
     }
-  },
-  mutations: {
-  },
-  actions: {
   },
   modules: {
     user, // 用户模块

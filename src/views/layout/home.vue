@@ -51,6 +51,7 @@
 <script>
 import GoodsItem from '@/components/GoodsItem.vue' // 导入商品展示框组件
 import { mapState, mapMutations } from 'vuex'// 开启 vuex 的 map 映射功能, 获取首页模块 home 中的数据
+
 export default {
   name: 'homeIndex', // 二级路由, 首页组件
   created () {
@@ -63,7 +64,7 @@ export default {
     ...mapState('home', ['page', 'items', 'bannerList', 'navBarList', 'proList']) // 获取到 home 首页模块中的状态数据, page: 页面配置 items: 页面配置选项 bannerList: 轮播图数据 navBarList: 导航数据 proList: 商品数据
   },
   components: {
-    GoodsItem
+    GoodsItem // 商品展示框组件
   }
 }
 

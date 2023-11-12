@@ -2,7 +2,7 @@
   <div class="cart">
     <van-nav-bar title="购物车" fixed />
 
-    <!-- 这是用户成功登录, 且购物车有数据时才展示的盒子 -->
+    <!-- 显示条件: 用户成功登录, 且购物车有数据时才展示的盒子 -->
     <div v-if="isLogin && cartList.length > 0 ">
       <!-- 购物车开头 -->
       <div class="cart-title">
@@ -25,16 +25,17 @@
           <span class="tit text-ellipsis-2">{{ item.goods.goods_name }}</span>
           <span class="bottom">
             <div class="price">¥ <span>{{ item.goods.goods_price_min }}</span></div>
+
             <!-- 计数盒子 -->
             <!-- 特别注意: 监听 @input 时 (1) 需要组件的 input 通知的传值 (2) 又需要调用函数传参
             解决方法: 使用箭头函数包装一层, 组件的传值用形参 value 接收, 函数的传值用函数的形参 item 来接收 -->
             <CountBox
-            @input="(value) => changeCount(
-              value, // 商品购买数量 goodsNum
-              item.goods_id, // 商品id
-              item.goods_sku_id // 商品规格SkuId
-            )"
-            :value="item.goods_num">
+              @input="(value) => changeCount(
+                value, // 商品购买数量 goodsNum
+                item.goods_id, // 商品id
+                item.goods_sku_id // 商品规格SkuId
+              )"
+              :value="item.goods_num">
             </CountBox>
           </span>
         </div>
@@ -45,7 +46,7 @@
       <div class="footer-fixed">
       <!-- 全选按钮 -->
       <!-- 点击触发"切换全选状态"事件, 形参为新的选中状态, 这里传入"已有全选状态"的取反, 即已全选 => 全不选, 未全选 => 被全选  -->
-      <div  class="all-check" @click="toggleAllCheck(!isAllChecked)">
+      <div class="all-check" @click="toggleAllCheck(!isAllChecked)">
         <van-checkbox  icon-size="18" :value="isAllChecked"></van-checkbox>
         全选
       </div>
@@ -62,7 +63,7 @@
       </div>
     </div>
 
-    <!-- 这是用户未登录, 或者购物车无数据时才展示的盒子-->
+    <!-- 显示条件: 用户未登录, 或者购物车无数据时才展示的盒子-->
     <div class="empty-cart" v-else>
       <img src="@/assets/empty.png" alt="">
       <div class="tips">
@@ -77,7 +78,7 @@
 import CountBox from '@/components/CountBox.vue'// 导入计数盒子组件
 import { mapActions, mapState, mapGetters, mapMutations } from 'vuex' // 导入 vuex 提供的 map映射方法们
 export default {
-  name: 'cartIndex',
+  name: 'cartIndex', // 这是二级路由: 购物车页面
   data () {
     return {
       isEdit: false// '编辑按钮'是否为编辑状态, 默认为 false
@@ -96,39 +97,39 @@ export default {
 
     /** 组件: 计数盒子发起的通知事件
      *
-     * @param {*} goodsNum 当前商品购买数量
-     * @param {*} goodsId 当前商品id
-     * @param {*} goodsSkuId 当前商品规格SkuId
+     * @param {String} goodsNum 当前商品购买数量
+     * @param {String} goodsId 当前商品id
+     * @param {String} goodsSkuId 当前商品规格SkuId
      */
     changeCount (goodsNum, goodsId, goodsSkuId) {
-      console.log('当前商品购买数量:', goodsNum, '当前商品id:', goodsId, '当前商品规格SkuId:', goodsSkuId)
-      // 调用 cart 模块中的 action 方法, 进行数量的修改
-      this.changeCountAction({ goodsNum: goodsNum, goodsId: goodsId, goodsSku: goodsSkuId })
+      // console.log('当前商品购买数量:', goodsNum, '当前商品id:', goodsId, '当前商品规格SkuId:', goodsSkuId) // 调试用代码: 打印当前商品购买的具体信息
+
+      this.changeCountAction({ goodsNum: goodsNum, goodsId: goodsId, goodsSku: goodsSkuId }) // 调用 cart 模块中的 action 方法, 进行数量的修改
     },
 
-    /** 点击删除按钮触发删除事件
-     *
-     */
+    /** 点击删除按钮触发删除事件 */
     async handleDel () {
       // 非空判断: 当前选中的商品总数是否为0
       if (this.selectedCount === 0) {
         return
       }
+
       // 调用 cart 模块中的方法, 删除选中的商品项
       await this.delSelect()
       this.isEdit = false // 删除商品之后, 重置编辑模式为结算模式
     },
-    /** 点击结算按钮, 触发结算事件
-     *
-     */
+
+    /** 点击结算按钮, 触发结算事件 */
     goPay () {
       // 判断: 是否没有选中任何商品
       if (this.selectedCount <= 0) {
-        this.$toast.fail('您还没有选中任何商品哦')// 给用户提示
+        this.$toast.fail('您还没有选中任何商品哦') // 给用户提示
         return
       }
       const cartIds = this.selectedCartList.map(item => item.id).join(',')// 购物车商品项id 格式: String 'cartId1, cartId2, cartId3 ...'', 通过 .map() 与 .join() 方法实现
-      console.log(cartIds)
+
+      // console.log(cartIds) 调试用代码: 查看获取到的 cartIds 结果
+
       this.$router.push({
         path: '/pay', // 跳转到 pay 页面
         query: {
@@ -147,6 +148,7 @@ export default {
       'selectedPrice', // 被选中的商品的总价
       'isAllChecked' // 商品是否被全选
     ]),
+
     isLogin () { // 用户登录状态: 是否登录
       return this.$store.getters.token // 有无拿到传递的 token
     }
@@ -170,7 +172,7 @@ export default {
   },
   components: {
     CountBox // 计数盒子组件
-  } // 二级路由, 购物车组件
+  }
 }
 </script>
 

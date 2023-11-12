@@ -167,8 +167,8 @@ export default {
     onChange (index) {
       this.current = index
     },
-    /** 获取商品详细页的所有数据, 包括商品信息等等 */
-    async getDetail () {
+    /** 获取/更新商品详细页的所有数据, 包括商品信息等等 */
+    async setDetail () {
       const { data: { detail } } = await getProDetail(this.goodsId)
       this.detail = detail // 更新响应的"商品详细信息"数据
       this.images = detail.goods_images // 更新轮播图图片
@@ -176,7 +176,7 @@ export default {
     },
 
     /** 获取商品详细页的评价 */
-    async getComments () {
+    async setComments () {
       const { data: { list, total } } = await getProComments(this.goodsId, 3) // 限制展示的商品的评价是3条
       this.commentList = list // 存入评价列表
       this.total = total // 存入评价总数
@@ -215,9 +215,9 @@ export default {
 
   created () {
     // 页面一创建, 立刻发送请求获取详细商品信息
-    this.getDetail()
+    this.setDetail()
     // 获取商品评价
-    this.getComments()
+    this.setComments()
   },
   components: {
     CountBox // 计数盒子

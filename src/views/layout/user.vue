@@ -107,14 +107,15 @@ import loginConfirm from '@/mixins/loginConfirm.js' // 导入混入的通用方�
 
 export default {
   name: 'userIndex', // 二级路由, 用户组件
-  mixins: [loginConfirm],
+  mixins: [loginConfirm], // 导入混入组件
   data () {
     return {
       detail: {} // 用户详细信息
     }
   },
   created () {
-    if (this.isLogin) { // 调用混入中的通用方法_是否发生了请求登录弹窗
+    // 判断: 是否没有发送过登录弹窗请求
+    if (!this.loginConfirm) { // 调用混入中的通用方法_是否发生了请求登录弹窗
       this.getUserInfoDetail() // 已登录, 立刻获取用户信息
     }
   },
@@ -130,10 +131,11 @@ export default {
       this.detail = userInfo // 取得并存储用户详细信息
       // console.log('用户详细信息', this.detail)
     },
+
     /** 点击登出按钮, 退出登录, 清除本地数据 */
     logout () {
       // 修改存储在 vuex 中的数据, 需要调用 mutation
-      this.$dialog.confirm({
+      this.$dialog.confirm({ // 提示弹框
         title: '温馨提示', // 弹框标题
         message: '您确认要退出吗?' // 弹框消息
       }).then(() => { // 点击确定, 清空数据

@@ -35,7 +35,7 @@ export default {
             this.$router.replace({ // 代码优化: 用 replace()方法替换 push()方法, 不保留历史
               path: '/login', // 跳转地址
               query: {
-                backUrl: this.$route.fullPath // backUrl: (路径传参自定义变量)回跳地址=当前路径地址
+                backUrl: this.$route.fullPath // backUrl: (路径传参自定义变量)回跳地址 = 当前路径地址
               }
             })
           }) // 点击确定

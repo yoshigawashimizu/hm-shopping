@@ -15,28 +15,23 @@ export default {
   mutations: {
     /** 发送自定义请求获取到商品搜索结果列表
      *
-     * @param obj 查询传参
-     * {
-     *  sortType: 结果排序规则, 默认为'all'按综合搜索
-        sortPrice: 价格排序规则, 可选
-        categoryId: 分类页id, 可选
-        goodsName: 商品名称, 可选
-        page: 页码, 默认为 1
-     * }
-     * */
+     * @param {Object} obj 传参载荷
+     * @param {String} obj.sortType 结果排序规则
+     * @param {String} obj.categoryId 分类页id
+     * @param {String} obj.sortPrice 价格排序规则
+     * @param {String} obj.goodsName 商品名称/用户输入的搜索词
+     * @param {Number} obj.page 页码
+     */
     async setProList (state, obj) {
-      state.querySearch = obj.goodsName // 将用户输入的搜索关键字存入 state 中
+      state.querySearch = obj.goodsName // 将 '商品名称/用户输入的搜索词' 存入 state 中
       state.categoryId = obj.categoryId // 将分类页搜索关键字id categoryId 存入 state 中
-      const { data: { list } } = await getProList(obj)
-      // console.log('获取到的商品列表数组:', list) // 测试环境用, 搜索结构, 商品数据
-      state.page = list.current_page
-      state.proList = list.data
-      state.total = list.total
-    }
-  },
-  actions: {
-  },
-  getters: {
 
+      // 发起请求, 获取搜索结果
+      const { data: { list } } = await getProList(obj)
+      // console.log('获取到的商品列表数组:', list) // 测试用代码: 搜索结构, 商品数据
+      state.page = list.current_page // 存储返回页面
+      state.proList = list.data // 存储搜索结果列表
+      state.total = list.total // 存储返回数据总条数
+    }
   }
 }
