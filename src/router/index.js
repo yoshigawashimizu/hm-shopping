@@ -1,19 +1,22 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Login from '@/views/login' // 登录模块
+import store from '@/store' // 状态管理
+
+// ↓首页模块, 频繁加载, 无需懒加载
 import Layout from '@/views/layout' // 首页架子模块
-import Search from '@/views/search' // 搜索模块模块
-import SearchList from '@/views/search/list.vue' // 搜索结果列表模块
-import ProDetail from '@/views/prodetail' // 商品详情模块
-import Pay from '@/views/pay' // 支付模块
-import MyOrder from '@/views/myOrder' // 我的订单模块
-import NotFound from '@/views/notFound' // 404未找到模块
-// 二级路由模块👇
 import Home from '@/views/layout/home.vue' // 首页模块
 import Category from '@/views/layout/category.vue' // 分页类模块
 import Cart from '@/views/layout/cart.vue' // 购物车模块
 import User from '@/views/layout/user.vue' // 用户模块
-import store from '@/store' // 状态管理
+
+// 不频繁加载内容, 懒加载
+const Login = () => import('@/views/login') // 登录模块
+const Search = () => import('@/views/search') // 搜索模块模块
+const SearchList = () => import('@/views/search/list') // 搜索结果列表模块
+const ProDetail = () => import('@/views/prodetail') // 商品详情模块
+const Pay = () => import('@/views/pay') // 支付模块
+const MyOrder = () => import('@/views/myOrder') // 我的订单模块
+const NotFound = () => import('@/views/notFound') // 404未找到模块
 
 Vue.use(VueRouter)
 
